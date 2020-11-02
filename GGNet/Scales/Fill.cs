@@ -64,7 +64,7 @@ namespace GGNet.Scales
                 return;
             }
 
-            var extended = Wilkinson.extended(limits.min, limits.max, m);
+            var extended = Wilkinson.extended(limits.min, limits.max, m, true);
 
             var labels = new (string value, string label)[extended.Length];
             var breaks = new string[extended.Length];
@@ -138,7 +138,7 @@ namespace GGNet.Scales
             if (!grid)
                 return;
 
-            var extended = Wilkinson.extended(limits.min, limits.max, m);
+            var extended = Wilkinson.extended(limits.min, limits.max, m, true);
 
             var labels = new (string value, string label)[extended.Length];
             var breaks = new string[extended.Length];
