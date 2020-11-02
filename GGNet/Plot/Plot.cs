@@ -2843,6 +2843,25 @@ namespace GGNet
             return data;
         }
 
+        public static Data<T, TX, TY> Scale_Fill_Log10<T, TX, TY>(this Data<T, TX, TY> data,
+            Func<T, double> selector,
+            string[] palette,
+            int m = 5,
+            string format = "0.##",
+            bool guide = true,
+            string name = null)
+            where TX : struct
+            where TY : struct
+        {
+            var scale = new FillLog10(palette, m, format);
+
+            data.Aesthetics.Scales.Add(scale);
+
+            data.Aesthetics.Fill = new Aesthetic<T, double, string>(selector, scale, guide, name);
+
+            return data;
+        }
+
         public static Data<T, TX, TY> Scale_Fill_Identity<T, TX, TY>(this Data<T, TX, TY> data, Func<T, string> selector)
             where TX : struct
             where TY : struct
