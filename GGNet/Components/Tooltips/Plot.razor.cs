@@ -1,4 +1,6 @@
-﻿namespace GGNet.Components.Tooltips
+﻿using System.Globalization;
+
+namespace GGNet.Components.Tooltips
 {
     public partial class Plot: Tooltip
     {
@@ -20,13 +22,13 @@
             };
 
             return $@"
-<foreignObject role=""{role}"" x=""{tx}"" y=""{ty}"" width=""1"" height=""1"">
-        <div>
-            <div class=""arrow""></div>
-            <div class=""bubble"">{content}</div>
-        </div>
-    </foreignObject>
-";
+                <foreignObject role=""{role}"" x=""{tx.ToString(CultureInfo.InvariantCulture)}"" y=""{ty.ToString(CultureInfo.InvariantCulture)}"" width=""1"" height=""1"">
+                    <div>
+                        <div class=""arrow""></div>
+                        <div class=""bubble"">{content}</div>
+                    </div>
+                </foreignObject>
+            ";
         }
     }
 }

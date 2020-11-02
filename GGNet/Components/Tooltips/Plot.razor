@@ -1,4 +1,5 @@
 ﻿@inherits Tooltip
+@using System.Globalization
 
 @if (visibility)
 {
@@ -7,9 +8,9 @@
 
             #@(Id) [role^="tooltip"] {
                 --tooltip-color: @color;
-                --tooltip-alpha: @alpha;
+                --tooltip-alpha: @alpha.ToString(CultureInfo.InvariantCulture);
                 --tooltip-theme-color: @themeColor;
-                --tooltip-theme-alpha: @themeAlpha;
+                --tooltip-theme-alpha: @themeAlpha.ToString(CultureInfo.InvariantCulture);
 
                 --tooltip-fadein-duration: 500ms;
 
@@ -35,7 +36,7 @@
                 #@(Id) [role^="tooltip"] .bubble {
                     position: absolute;
                     border-radius: @(Theme.Tooltip.Radius);
-                    padding: @(Theme.Tooltip.Margin.Top)@(Theme.Tooltip.Margin.Units) @(Theme.Tooltip.Margin.Right)@(Theme.Tooltip.Margin.Units) @(Theme.Tooltip.Margin.Bottom)@(Theme.Tooltip.Margin.Units) @(Theme.Tooltip.Margin.Left)@(Theme.Tooltip.Margin.Units);
+                    padding: @(Theme.Tooltip.Margin);
                     background: var(--tooltip-theme-color);
                     white-space: nowrap;
                     pointer-events: none;

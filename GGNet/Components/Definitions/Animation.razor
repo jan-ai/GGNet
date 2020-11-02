@@ -1,15 +1,16 @@
-﻿<defs>
+﻿@using System.Globalization
+
+<defs>
     <style type="text/css">
         #@(Id) .animate-point {
-                transition: transform @(Theme.Animation.Point.Transition)s ease-in-out;
-            }
-
+            transition: transform @(Theme.Animation.Point.Transition.ToString(CultureInfo.InvariantCulture))s ease-in-out;
+        }
             #@(Id) .animate-point:hover {
-                transform: scale(@(Theme.Animation.Point.Scale));
+                transform: scale(@(Theme.Animation.Point.Scale.ToString(CultureInfo.InvariantCulture)));
             }
 
         #@(Id) .animate-bar {
-            transition: transform @(Theme.Animation.Bar.Transition)s ease-in-out;
+            transition: transform @(Theme.Animation.Bar.Transition.ToString(CultureInfo.InvariantCulture))s ease-in-out;
             fill-opacity: 0.6 !important;
         }
             #@(Id) .animate-bar:hover {
@@ -17,7 +18,7 @@
             }
 
         #@(Id) .animate-map {
-            transition: transform @(Theme.Animation.Map.Transition)s ease-in-out;
+            transition: transform @(Theme.Animation.Map.Transition.ToString(CultureInfo.InvariantCulture))s ease-in-out;
             fill-opacity: 0.6 !important;
             stroke-width: 0.2 !important;
         }
@@ -27,7 +28,7 @@
             }
 
         #@(Id) .animate-hex {
-            transition: transform @(Theme.Animation.Hex.Transition)s ease-in-out;
+            transition: transform @(Theme.Animation.Hex.Transition.ToString(CultureInfo.InvariantCulture))s ease-in-out;
             fill-opacity: 0.7 !important;
         }
             #@(Id) .animate-hex:hover {

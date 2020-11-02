@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 
 using Microsoft.AspNetCore.Components;
 
@@ -23,7 +24,7 @@ namespace GGNet.Components
         [Parameter]
         public string Clip { get; set; }
 
-        private StringBuilder sb = new StringBuilder();
+        private readonly StringBuilder sb = new StringBuilder();
 
         protected override bool ShouldRender() => RenderPolicy.ShouldRender();
 
@@ -31,21 +32,14 @@ namespace GGNet.Components
         {
             sb.Clear();
 
-            var (x, y) = path.Points[0];
-
-            sb.Append("M ");
-            sb.Append(Coord.CoordX(x));
-            sb.Append(" ");
-            sb.Append(Coord.CoordY(y));
-
-            for (var j = 1; j < path.Points.Count; j++)
+            for (var j = 0; j < path.Points.Count; j++)
             {
-                (x, y) = path.Points[j];
+                var (x, y) = path.Points[j];
 
-                sb.Append(" L ");
-                sb.Append(Coord.CoordX(x));
+                sb.Append(j == 0 ? "M " : " L ");
+                sb.Append(Coord.CoordX(x).ToString(CultureInfo.InvariantCulture));
                 sb.Append(" ");
-                sb.Append(Coord.CoordY(y));
+                sb.Append(Coord.CoordY(y).ToString(CultureInfo.InvariantCulture));
             }
 
             return sb.ToString();
@@ -55,31 +49,24 @@ namespace GGNet.Components
         {
             sb.Clear();
 
-            var (x, ymin, ymax) = area.Points[0];
-
-            sb.Append("M ");
-            sb.Append(Coord.CoordX(x));
-            sb.Append(" ");
-            sb.Append(Coord.CoordY(ymax));
-
-            for (var j = 1; j < area.Points.Count; j++)
+            for (var j = 0; j < area.Points.Count; j++)
             {
-                (x, _, ymax) = area.Points[j];
+                var (x, _, ymax) = area.Points[j];
 
-                sb.Append(" L ");
-                sb.Append(Coord.CoordX(x));
+                sb.Append(j == 0 ? "M " : " L ");
+                sb.Append(Coord.CoordX(x).ToString(CultureInfo.InvariantCulture));
                 sb.Append(" ");
-                sb.Append(Coord.CoordY(ymax));
+                sb.Append(Coord.CoordY(ymax).ToString(CultureInfo.InvariantCulture));
             }
 
             for (var j = 0; j < area.Points.Count; j++)
             {
-                (x, ymin, _) = area.Points[area.Points.Count - j - 1];
+                var (x, ymin, _) = area.Points[area.Points.Count - j - 1];
 
                 sb.Append(" L ");
-                sb.Append(Coord.CoordX(x));
+                sb.Append(Coord.CoordX(x).ToString(CultureInfo.InvariantCulture));
                 sb.Append(" ");
-                sb.Append(Coord.CoordY(ymin));
+                sb.Append(Coord.CoordY(ymin).ToString(CultureInfo.InvariantCulture));
             }
 
             sb.Append(" Z");
@@ -89,17 +76,12 @@ namespace GGNet.Components
 
         private void AppendPolygon(Geospacial.Polygon poly)
         {
-            sb.Append("M ");
-            sb.Append(Coord.CoordX(poly.Longitude[0]));
-            sb.Append(" ");
-            sb.Append(Coord.CoordY(poly.Latitude[0]));
-
-            for (var i = 1; i < poly.Longitude.Length; i++)
+            for (var j = 0; j < poly.Longitude.Length; j++)
             {
-                sb.Append(" L ");
-                sb.Append(Coord.CoordX(poly.Longitude[i]));
+                sb.Append(j == 0 ? "M " : " L ");
+                sb.Append(Coord.CoordX(poly.Longitude[j]).ToString(CultureInfo.InvariantCulture));
                 sb.Append(" ");
-                sb.Append(Coord.CoordY(poly.Latitude[i]));
+                sb.Append(Coord.CoordY(poly.Latitude[j]).ToString(CultureInfo.InvariantCulture));
             }
 
             sb.Append(" Z");
@@ -118,11 +100,10 @@ namespace GGNet.Components
         {
             sb.Clear();
 
-            AppendPolygon(polygons[0]);
-
-            for (var i = 1; i < polygons.Length; i++)
+            for (var i = 0; i < polygons.Length; i++)
             {
-                sb.Append(" ");
+                if (i > 0)
+                    sb.Append(" ");
 
                 AppendPolygon(polygons[i]);
             }

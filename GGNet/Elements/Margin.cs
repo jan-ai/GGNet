@@ -1,4 +1,6 @@
-﻿namespace GGNet.Elements
+﻿using System.Globalization;
+
+namespace GGNet.Elements
 {
     public class Margin
     {
@@ -20,5 +22,7 @@
         public double Left { get; set; }
 
         public Units Units { get; set; }
+
+        public override string ToString() => $"{Top.ToString(CultureInfo.InvariantCulture)}{Units} {Right.ToString(CultureInfo.InvariantCulture)}{Units} {Bottom.ToString(CultureInfo.InvariantCulture)}{Units} {Left.ToString(CultureInfo.InvariantCulture)}{Units}";
     }
 }

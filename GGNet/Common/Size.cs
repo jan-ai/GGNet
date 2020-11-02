@@ -1,4 +1,6 @@
-﻿namespace GGNet
+﻿using System.Globalization;
+
+namespace GGNet
 {
     using static Units;
 
@@ -14,6 +16,6 @@
 
         public Units Units { get; set; }
 
-        public override string ToString() => $"{Value}{Units}";
+        public override string ToString() => $"{Value.ToString(CultureInfo.InvariantCulture)}{Units}";
     }
 }

@@ -1,4 +1,5 @@
 ﻿@inherits Tooltip
+@using System.Globalization
 
 @if (visibility)
 {
@@ -7,9 +8,9 @@
 
             #@(Id) [role^="tooltip"] {
                 --tooltip-color: @color;
-                --tooltip-alpha: @alpha;
+                --tooltip-alpha: @alpha.ToString(CultureInfo.InvariantCulture);
                 --tooltip-theme-color: @themeColor;
-                --tooltip-theme-alpha: @themeAlpha;
+                --tooltip-theme-alpha: @themeAlpha.ToString(CultureInfo.InvariantCulture);
 
                 --tooltip-fadein-duration: 500ms;
 

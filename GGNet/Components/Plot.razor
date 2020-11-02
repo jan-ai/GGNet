@@ -1,10 +1,12 @@
-﻿@typeparam T
+﻿@using System.Globalization
+
+@typeparam T
 @typeparam TX
 @typeparam TY
 
 @inherits PlotBase<T, TX, TY>
 
-<svg id=@Id xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 @Width @Height">
+<svg id=@Id xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 @Width.ToString(CultureInfo.InvariantCulture) @Height.ToString(CultureInfo.InvariantCulture)">
 
     <GGNet.Components.Definitions.Plot Id=@Id Theme=@Theme />
 
@@ -31,7 +33,9 @@
                             x2=@(Theme.Legend.Direction == Direction.Vertical ? "0%" : "100%")
                             y2="@(Theme.Legend.Direction == Direction.Vertical ? "100%" : "0%")">
 
-                <stop offset="0%" stop-color=@l.Items[0].elements[0].Value.Fill stop-opacity=@l.Items[0].elements[0].Value.Alpha />
+                <stop offset="0%" 
+                      stop-color=@l.Items[0].elements[0].Value.Fill 
+                      stop-opacity=@l.Items[0].elements[0].Value.Alpha.ToString(CultureInfo.InvariantCulture) />
 
                 @if (n > 2)
                 {
@@ -39,11 +43,15 @@
 
                     @for (var j = 0; j < n - 1; j++)
                     {
-                        <stop offset="@(j * delta)%" stop-color=@l.Items[j].elements[0].Value.Fill stop-opacity=@l.Items[j].elements[0].Value.Alpha />
+                        <stop offset="@((j * delta).ToString(CultureInfo.InvariantCulture))%" 
+                              stop-color=@l.Items[j].elements[0].Value.Fill 
+                              stop-opacity=@l.Items[j].elements[0].Value.Alpha.ToString(CultureInfo.InvariantCulture) />
                     }
                 }
 
-                <stop offset="100%" stop-color=@l.Items[n - 1].elements[0].Value.Fill stop-opacity=@l.Items[n - 1].elements[0].Value.Alpha />
+                <stop offset="100%" 
+                      stop-color=@l.Items[n - 1].elements[0].Value.Fill 
+                      stop-opacity=@l.Items[n - 1].elements[0].Value.Alpha.ToString(CultureInfo.InvariantCulture) />
 
             </linearGradient>
         }
@@ -53,7 +61,10 @@
     <GGNet.Components.Definitions.Animation Id=@Id Theme=@Theme />
 
     <clipPath id="@(Id)-plot">
-        <rect x="0" y="0" width=@Width height=@Height />
+        <rect x="0" 
+              y="0" 
+              width=@Width.ToString(CultureInfo.InvariantCulture) 
+              height=@Height.ToString(CultureInfo.InvariantCulture) />
     </clipPath>
 
     <rect width="100%" height="100%" class="plot" />
@@ -73,7 +84,9 @@
                     offset += Theme.Legend.Title.Margin.Top;
 
                     <g clip-path="url(#@(Id)-plot)">
-                        <text x=@Legend.X y=@(offset + l.Title.Height) class="legendTitle">@l.Title.Value</text>
+                        <text x=@Legend.X.ToString(CultureInfo.InvariantCulture) 
+                              y=@((offset + l.Title.Height).ToString(CultureInfo.InvariantCulture)) 
+                              class="legendTitle">@l.Title.Value</text>
                     </g>
 
                     offset += l.Title.Height + Theme.Legend.Title.Margin.Bottom;
@@ -93,56 +106,58 @@
 
                             if (element.Value is Elements.HLine hline)
                             {
-                                <line x1=@Legend.Y
-                                      x2=@(Legend.X + l.Width)
-                                      y1=@(offset + elements.Height / 2.0)
-                                      y2=@(offset + elements.Height / 2.0)
-                                      stroke-width=@hline.Width
+                                <line x1=@Legend.Y.ToString(CultureInfo.InvariantCulture)
+                                      x2=@((Legend.X + l.Width).ToString(CultureInfo.InvariantCulture))
+                                      y1=@((offset + elements.Height / 2.0).ToString(CultureInfo.InvariantCulture))
+                                      y2=@((offset + elements.Height / 2.0).ToString(CultureInfo.InvariantCulture))
+                                      stroke-width=@hline.Width.ToString(CultureInfo.InvariantCulture)
                                       stroke=@hline.Fill
-                                      stroke-opacity=@hline.Alpha
+                                      stroke-opacity=@hline.Alpha.ToString(CultureInfo.InvariantCulture)
                                       clip-path="url(#@(Id)-plot)" />
 
                             }
                             else if (element.Value is Elements.VLine vline)
                             {
-                                <line x1=@(Legend.X + l.Width / 2.0)
-                                      x2=@(Legend.X + l.Width / 2.0)
-                                      y1=@offset
-                                      y2=@(offset + elements.Height)
-                                      stroke-width=@vline.Width
+                                <line x1=@((Legend.X + l.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                      x2=@((Legend.X + l.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                      y1=@offset.ToString(CultureInfo.InvariantCulture)
+                                      y2=@((offset + elements.Height).ToString(CultureInfo.InvariantCulture))
+                                      stroke-width=@vline.Width.ToString(CultureInfo.InvariantCulture)
                                       stroke=@vline.Fill
-                                      stroke-opacity=@vline.Alpha
+                                      stroke-opacity=@vline.Alpha.ToString(CultureInfo.InvariantCulture)
                                       clip-path="url(#@(Id)-plot)" />
 
                             }
                             else if (element.Value is Elements.Circle circle)
                             {
-                                <circle cx=@(Legend.X + l.Width / 2.0)
-                                        cy=@(offset + elements.Height / 2.0)
-                                        r=@circle.Radius
+                                <circle cx=@((Legend.X + l.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                        cy=@((offset + elements.Height / 2.0).ToString(CultureInfo.InvariantCulture))
+                                        r=@circle.Radius.ToString(CultureInfo.InvariantCulture)
                                         stroke-width="0.71"
                                         stroke=@circle.Fill
-                                        stroke-opacity=@circle.Alpha
+                                        stroke-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
                                         fill=@circle.Fill
-                                        fill-opacity=@circle.Alpha
+                                        fill-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
                                         clip-path="url(#@(Id)-plot)" />
                             }
                             else if (element.Value is Elements.Rectangle rect)
                             {
-                                <rect x=@Legend.X
-                                      y=@offset
-                                      width=@l.Width
-                                      height=@elements.Height
+                                <rect x=@Legend.X.ToString(CultureInfo.InvariantCulture)
+                                      y=@offset.ToString(CultureInfo.InvariantCulture)
+                                      width=@l.Width.ToString(CultureInfo.InvariantCulture)
+                                      height=@elements.Height.ToString(CultureInfo.InvariantCulture)
                                       fill=@rect.Fill
-                                      fill-opacity=@rect.Alpha
+                                      fill-opacity=@rect.Alpha.ToString(CultureInfo.InvariantCulture)
                                       stroke=@rect.Color
-                                      stroke-width=@rect.Width
+                                      stroke-width=@rect.Width.ToString(CultureInfo.InvariantCulture)
                                       clip-path="url(#@(Id)-plot)" />
                             }
                         }
 
                         <g clip-path="url(#@(Id)-legend)">
-                            <text x=@(Legend.X + l.Width + Theme.Legend.Labels.Margin.Left) y=@(offset + elements.Height / 2.0 + label.Height / 4.0) class="legendLabels">@label.Value</text>
+                            <text x=@((Legend.X + l.Width + Theme.Legend.Labels.Margin.Left).ToString(CultureInfo.InvariantCulture)) 
+                                  y=@((offset + elements.Height / 2.0 + label.Height / 4.0).ToString(CultureInfo.InvariantCulture)) 
+                                  class="legendLabels">@label.Value</text>
                         </g>
 
                         offset += Math.Max(elements.Height, label.Height) + Theme.Legend.Labels.Margin.Bottom;
@@ -160,14 +175,16 @@
                         var (label, _) = l.Items[j];
 
                         <g clip-path="url(#@(Id)-legend)">
-                            <text x=@xOffset y=@(offset + (j + 1.0) * 3.0 * l.Height + label.Height / 4.0) class="legendLabels">@label.Value</text>
+                            <text x=@xOffset.ToString(CultureInfo.InvariantCulture) 
+                                  y=@((offset + (j + 1.0) * 3.0 * l.Height + label.Height / 4.0).ToString(CultureInfo.InvariantCulture)) 
+                                  class="legendLabels">@label.Value</text>
                         </g>
                     }
 
-                    <rect x=@Legend.X
-                          y=@offset
-                          width=@l.Width
-                          height=@(3.0 * n * l.Height)
+                    <rect x=@Legend.X.ToString(CultureInfo.InvariantCulture)
+                          y=@offset.ToString(CultureInfo.InvariantCulture)
+                          width=@l.Width.ToString(CultureInfo.InvariantCulture)
+                          height=@((3.0 * n * l.Height).ToString(CultureInfo.InvariantCulture))
                           fill="url(#gadient-@(Id)-@i)"
                           stroke=@Theme.Legend.Labels.Color
                           stroke-width="0.2"
@@ -189,7 +206,9 @@
                     offset += Theme.Legend.Title.Margin.Left;
 
                     <g clip-path="url(#@(Id)-plot)">
-                        <text x=@offset y=@(middle + l.Title.Height / 4.0) class="legendTitle">@l.Title.Value</text>
+                        <text x=@offset.ToString(CultureInfo.InvariantCulture)
+                              y=@((middle + l.Title.Height / 4.0).ToString(CultureInfo.InvariantCulture)) 
+                              class="legendTitle">@l.Title.Value</text>
                     </g>
 
                     offset += l.Title.Width + Theme.Legend.Title.Margin.Right;
@@ -207,52 +226,52 @@
 
                             if (element.Value is Elements.HLine hline)
                             {
-                                <line x1=@offset
-                                      x2=@(offset + elements.Width)
-                                      y1=@(middle)
-                                      y2=@(middle)
-                                      stroke-width=@hline.Width
+                                <line x1=@offset.ToString(CultureInfo.InvariantCulture)
+                                      x2=@((offset + elements.Width).ToString(CultureInfo.InvariantCulture))
+                                      y1=@middle.ToString(CultureInfo.InvariantCulture)
+                                      y2=@middle.ToString(CultureInfo.InvariantCulture)
+                                      stroke-width=@hline.Width.ToString(CultureInfo.InvariantCulture)
                                       stroke=@hline.Fill
-                                      stroke-opacity=@hline.Alpha
+                                      stroke-opacity=@hline.Alpha.ToString(CultureInfo.InvariantCulture)
                                       stroke-dasharray=@(hline.LineType.DashArray())
                                       clip-path="url(#@(Id)-plot)" />
 
                             }
                             else if (element.Value is Elements.VLine vline)
                             {
-                                <line x1=@(offset + elements.Width / 2.0)
-                                      x2=@(offset + elements.Width / 2.0)
-                                      y1=@Legend.Y
-                                      y2=@(Legend.Y + Legend.Height)
-                                      stroke-width=@vline.Width
+                                <line x1=@((offset + elements.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                      x2=@((offset + elements.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                      y1=@Legend.Y.ToString(CultureInfo.InvariantCulture)
+                                      y2=@((Legend.Y + Legend.Height).ToString(CultureInfo.InvariantCulture))
+                                      stroke-width=@vline.Width.ToString(CultureInfo.InvariantCulture)
                                       stroke=@vline.Fill
-                                      stroke-opacity=@vline.Alpha
+                                      stroke-opacity=@vline.Alpha.ToString(CultureInfo.InvariantCulture)
                                       stroke-dasharray=@(vline.LineType.DashArray())
                                       clip-path="url(#@(Id)-plot)" />
 
                             }
                             else if (element.Value is Elements.Circle circle)
                             {
-                                <circle cx=@(offset + elements.Width / 2.0)
-                                        cy=@middle
-                                        r=@circle.Radius
+                                <circle cx=@((offset + elements.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                        cy=@middle.ToString(CultureInfo.InvariantCulture)
+                                        r=@circle.Radius.ToString(CultureInfo.InvariantCulture)
                                         stroke-width="0.71"
                                         stroke=@circle.Fill
-                                        stroke-opacity=@circle.Alpha
+                                        stroke-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
                                         fill=@circle.Fill
-                                        fill-opacity=@circle.Alpha
+                                        fill-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
                                         clip-path="url(#@(Id)-plot)" />
                             }
                             else if (element.Value is Elements.Rectangle rect)
                             {
-                                <rect x=@offset
-                                      y=@(middle - elements.Height / 2.0)
-                                      width=@elements.Width
-                                      height=@elements.Height
+                                <rect x=@offset.ToString(CultureInfo.InvariantCulture)
+                                      y=@((middle - elements.Height / 2.0).ToString (CultureInfo.InvariantCulture))
+                                      width=@elements.Width.ToString(CultureInfo.InvariantCulture)
+                                      height=@elements.Height.ToString(CultureInfo.InvariantCulture)
                                       fill=@rect.Fill
-                                      fill-opacity=@rect.Alpha
+                                      fill-opacity=@rect.Alpha.ToString(CultureInfo.InvariantCulture)
                                       stroke=@rect.Color
-                                      stroke-width=@rect.Width
+                                      stroke-width=@rect.Width.ToString(CultureInfo.InvariantCulture)
                                       clip-path="url(#@(Id)-plot)" />
                             }
                         }
@@ -262,7 +281,9 @@
                         offset += Theme.Legend.Labels.Margin.Left;
 
                         <g clip-path="url(#@(Id)-legend)">
-                            <text x=@offset y=@(middle + label.Height / 4.0) class="legendLabels">@label.Value</text>
+                            <text x=@offset.ToString(CultureInfo.InvariantCulture)
+                                  y=@((middle + label.Height / 4.0).ToString(CultureInfo.InvariantCulture)) 
+                                  class="legendLabels">@label.Value</text>
                         </g>
 
                         offset += label.Width + Theme.Legend.Labels.Margin.Right;
@@ -279,16 +300,18 @@
                         var (label, _) = l.Items[j];
 
                         <g clip-path="url(#@(Id)-legend)">
-                            <text x=@(offset + 3.0 * (j + 1.0) * l.Width - label.Width / 2.0) y=@yOffset class="legendLabels">@label.Value</text>
+                            <text x=@((offset + 3.0 * (j + 1.0) * l.Width - label.Width / 2.0).ToString(CultureInfo.InvariantCulture)) 
+                                  y=@yOffset.ToString(CultureInfo.InvariantCulture) 
+                                  class="legendLabels">@label.Value</text>
                         </g>
                     }
 
                     yOffset += Theme.Legend.Labels.Margin.Bottom;
 
-                    <rect x=@offset
-                          y=@yOffset
-                          width=@(3.0 * l.Width * l.Items.Count)
-                          height=@l.Height
+                    <rect x=@offset.ToString(CultureInfo.InvariantCulture)
+                          y=@yOffset.ToString(CultureInfo.InvariantCulture)
+                          width=@((3.0 * l.Width * l.Items.Count).ToString(CultureInfo.InvariantCulture))
+                          height=@l.Height.ToString(CultureInfo.InvariantCulture)
                           fill="url(#gadient-@(Id)-@i)"
                           stroke=@Theme.Legend.Labels.Color
                           stroke-width="0.2"

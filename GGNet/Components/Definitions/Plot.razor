@@ -1,4 +1,6 @@
-﻿<defs>
+﻿@using System.Globalization
+
+<defs>
     <style type="text/css">
         line, polyline, polygon, path, rect, circle {
             stroke-linecap: butt;
@@ -52,30 +54,30 @@
         }
 
         #@(Id) .gridMajorX {
-            stroke-width: @(Theme.Panel.Grid.Major.X.Width);
+            stroke-width: @(Theme.Panel.Grid.Major.X.Width.ToString(CultureInfo.InvariantCulture));
             stroke: @(Theme.Panel.Grid.Major.X.Fill);
-            stroke-opacity: @(Theme.Panel.Grid.Major.X.Alpha);
+            stroke-opacity: @(Theme.Panel.Grid.Major.X.Alpha.ToString(CultureInfo.InvariantCulture));
             stroke-dasharray: @(Theme.Panel.Grid.Major.X.LineType.DashArray());
         }
 
         #@(Id) .gridMinorX {
-            stroke-width: @(Theme.Panel.Grid.Minor.X.Width);
+            stroke-width: @(Theme.Panel.Grid.Minor.X.Width.ToString(CultureInfo.InvariantCulture));
             stroke: @(Theme.Panel.Grid.Minor.X.Fill);
-            stroke-opacity: @(Theme.Panel.Grid.Minor.X.Alpha);
+            stroke-opacity: @(Theme.Panel.Grid.Minor.X.Alpha.ToString(CultureInfo.InvariantCulture));
             stroke-dasharray: @(Theme.Panel.Grid.Minor.X.LineType.DashArray());
         }
 
         #@(Id) .gridMajorY {
-            stroke-width: @(Theme.Panel.Grid.Major.Y.Width);
+            stroke-width: @(Theme.Panel.Grid.Major.Y.Width.ToString(CultureInfo.InvariantCulture));
             stroke: @(Theme.Panel.Grid.Major.Y.Fill);
-            stroke-opacity: @(Theme.Panel.Grid.Major.Y.Alpha);
+            stroke-opacity: @(Theme.Panel.Grid.Major.Y.Alpha.ToString(CultureInfo.InvariantCulture));
             stroke-dasharray: @(Theme.Panel.Grid.Major.Y.LineType.DashArray());
         }
 
         #@(Id) .gridMinorY {
-            stroke-width: @(Theme.Panel.Grid.Minor.Y.Width);
+            stroke-width: @(Theme.Panel.Grid.Minor.Y.Width.ToString(CultureInfo.InvariantCulture));
             stroke: @(Theme.Panel.Grid.Minor.Y.Fill);
-            stroke-opacity: @(Theme.Panel.Grid.Minor.Y.Alpha);
+            stroke-opacity: @(Theme.Panel.Grid.Minor.Y.Alpha.ToString(CultureInfo.InvariantCulture));
             stroke-dasharray: @(Theme.Panel.Grid.Minor.Y.LineType.DashArray());
         }
 

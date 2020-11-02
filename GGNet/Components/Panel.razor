@@ -1,4 +1,6 @@
-﻿@typeparam T
+﻿@using System.Globalization
+
+@typeparam T
 @typeparam TX
 @typeparam TY
 
@@ -12,41 +14,57 @@
     if (Plot.Title.Width > 0)
     {
         <g clip-path="url(#@(Plot.Id)-plot)">
-            <text x=@(Plot.Title.X + Area.X) y=@Plot.Title.Y class="title">@Plot.Data.Title</text>
+            <text x=@((Plot.Title.X + Area.X).ToString(CultureInfo.InvariantCulture)) 
+                  y=@Plot.Title.Y.ToString(CultureInfo.InvariantCulture) 
+                  class="title">@Plot.Data.Title</text>
         </g>
     }
 
     if (Plot.SubTitle.Width > 0)
     {
         <g clip-path="url(#@(Plot.Id)-plot)">
-            <text x=@(Plot.SubTitle.X + Area.X) y=@Plot.SubTitle.Y class="SubTitle">@Plot.Data.SubTitle</text>
+            <text x=@((Plot.SubTitle.X + Area.X).ToString(CultureInfo.InvariantCulture)) 
+                  y=@Plot.SubTitle.Y.ToString(CultureInfo.InvariantCulture) 
+                  class="SubTitle">@Plot.Data.SubTitle</text>
         </g>
     }
 }
 
 <defs>
     <clipPath id=@(clip)>
-        <rect x=@X y=@Y width=@Width height=@Height />
+        <rect x=@X.ToString(CultureInfo.InvariantCulture) 
+              y=@Y.ToString(CultureInfo.InvariantCulture) 
+              width=@Width.ToString(CultureInfo.InvariantCulture) 
+              height=@Height.ToString(CultureInfo.InvariantCulture) />
     </clipPath>
 
     <clipPath id="@(clip)-area">
-        <rect x=@Area.X y=@Area.Y width=@Area.Width height=@Area.Height />
+        <rect x=@Area.X.ToString(CultureInfo.InvariantCulture)
+              y=@Area.Y.ToString(CultureInfo.InvariantCulture)
+              width=@Area.Width.ToString(CultureInfo.InvariantCulture)
+              height=@Area.Height.ToString(CultureInfo.InvariantCulture) />
     </clipPath>
 </defs>
 
-<rect x=@Area.X y=@Area.Y width=@Area.Width height=@Area.Height class="panel" />
+<rect x=@Area.X.ToString(CultureInfo.InvariantCulture)
+      y=@Area.Y.ToString(CultureInfo.InvariantCulture)
+      width=@Area.Width.ToString(CultureInfo.InvariantCulture)
+      height=@Area.Height.ToString(CultureInfo.InvariantCulture)
+      class="panel" />
 
 @if (!string.IsNullOrEmpty(Data.Strip.x))
 {
     <g clip-path="url(#@(Plot.Id)-plot)">
-        <text x=@xStrip.X y=@xStrip.Y class="stripTextX">@Data.Strip.x</text>
+        <text x=@xStrip.X.ToString(CultureInfo.InvariantCulture)
+              y=@xStrip.Y.ToString(CultureInfo.InvariantCulture)
+              class="stripTextX">@Data.Strip.x</text>
     </g>
 }
 
 @if (!string.IsNullOrEmpty(Data.Strip.y))
 {
     <g clip-path="url(#@(Plot.Id)-plot)">
-        <text style="transform: translate(@(yStrip.X)px, @(yStrip.Y)px) rotate(@(Plot.Theme.Strip.Text.Y.Angle)deg);" class="stripTextY">@Data.Strip.y</text>
+        <text style="transform: translate(@(yStrip.X.ToString(CultureInfo.InvariantCulture))px, @(yStrip.Y.ToString(CultureInfo.InvariantCulture))px) rotate(@(Plot.Theme.Strip.Text.Y.Angle.ToString(CultureInfo.InvariantCulture))deg);" class="stripTextY">@Data.Strip.y</text>
     </g>
 }
 
@@ -59,7 +77,12 @@
         foreach (var b in xscale.Breaks)
         {
             var x = CoordX(b);
-            <line x1=@x x2=@x y1=@y1 y2=@y2 class="gridMajorX" clip-path="url(#@(clip)-area)" />
+            <line x1=@x.ToString(CultureInfo.InvariantCulture)
+                  x2=@x.ToString(CultureInfo.InvariantCulture) 
+                  y1=@y1.ToString(CultureInfo.InvariantCulture)
+                  y2=@y2.ToString(CultureInfo.InvariantCulture)
+                  class="gridMajorX" 
+                  clip-path="url(#@(clip)-area)" />
         }
     }
 
@@ -68,7 +91,12 @@
         foreach (var b in xscale.MinorBreaks)
         {
             var x = CoordX(b);
-            <line x1=@x x2=@x y1=@y1 y2=@y2 class="gridMinorX" clip-path="url(#@(clip)-area)" />
+            <line x1=@x.ToString(CultureInfo.InvariantCulture)
+                  x2=@x.ToString(CultureInfo.InvariantCulture) 
+                  y1=@y1.ToString(CultureInfo.InvariantCulture)
+                  y2=@y2.ToString(CultureInfo.InvariantCulture)
+                  class="gridMinorX" 
+                  clip-path="url(#@(clip)-area)" />
         }
     }
 
@@ -81,7 +109,9 @@
             if (Area.X < x && x < (Area.X + Area.Width))
             {
                 <g clip-path="url(#@(Plot.Id)-plot)">
-                    <text x=@x y=@xAxisText.Y class="axisTextX">@label</text>
+                    <text x=@x.ToString(CultureInfo.InvariantCulture)
+                          y=@xAxisText.Y.ToString(CultureInfo.InvariantCulture)
+                          class="axisTextX">@label</text>
                 </g>
             }
         }
@@ -93,7 +123,10 @@
             if (Area.X < x && x < (Area.X + Area.Width))
             {
                 <g clip-path="url(#@(Plot.Id)-plot)">
-                    <text x=@x y=@xAxisTitle.Y class="axisTitleX" text-anchor="middle">@label</text>
+                    <text x=@x.ToString(CultureInfo.InvariantCulture)
+                          y=@xAxisTitle.Y.ToString(CultureInfo.InvariantCulture)
+                          class="axisTitleX" 
+                          text-anchor="middle">@label</text>
                 </g>
             }
         }
@@ -110,7 +143,12 @@
         foreach (var b in yscale.Breaks)
         {
             var y = CoordY(b);
-            <line x1=@x1 x2=@x2 y1=@y y2=@y class="gridMajorY" clip-path="url(#@(clip)-area)" />
+            <line x1=@x1.ToString(CultureInfo.InvariantCulture)
+                  x2=@x2.ToString(CultureInfo.InvariantCulture)
+                  y1=@y.ToString(CultureInfo.InvariantCulture)
+                  y2=@y.ToString(CultureInfo.InvariantCulture)
+                  class="gridMajorY" 
+                  clip-path="url(#@(clip)-area)" />
         }
     }
 
@@ -119,7 +157,12 @@
         foreach (var b in yscale.MinorBreaks)
         {
             var y = CoordY(b);
-            <line x1=@x1 x2=@x2 y1=@y y2=@y class="gridMinorY" clip-path="url(#@(clip)-area)" />
+            <line x1=@x1.ToString(CultureInfo.InvariantCulture)
+                  x2=@x2.ToString(CultureInfo.InvariantCulture)
+                  y1=@y.ToString(CultureInfo.InvariantCulture)
+                  y2=@y.ToString(CultureInfo.InvariantCulture)
+                  class="gridMinorY" 
+                  clip-path="url(#@(clip)-area)" />
         }
     }
 
@@ -135,7 +178,9 @@
             if (Area.Y < (y - height / 2.0) && (y + offset) < (Area.Y + Area.Height))
             {
                 <g clip-path="url(#@(clip)">
-                    <text x=@yAxisText.X y=@y class="axisTextY">@label</text>
+                    <text x=@yAxisText.X.ToString(CultureInfo.InvariantCulture)
+                          y=@y.ToString(CultureInfo.InvariantCulture)
+                          class="axisTextY">@label</text>
                 </g>
             }
         }
@@ -147,21 +192,25 @@
 @if (!string.IsNullOrEmpty(Data.XLab.text))
 {
     <g clip-path="url(#@(Plot.Id)-plot)">
-        <text x=@xAxisTitle.X y=@xAxisTitle.Y class="axisTitleX">@Data.XLab.text</text>
+        <text x=@xAxisTitle.X.ToString(CultureInfo.InvariantCulture)
+              y=@xAxisTitle.Y.ToString(CultureInfo.InvariantCulture)
+              class="axisTitleX">@Data.XLab.text</text>
     </g>
 }
 
 @if (!string.IsNullOrEmpty(@Data.YLab.text))
 {
     <g clip-path="url(#@(Plot.Id)-plot)">
-        <text style="transform: translate(@(yAxisTitle.X)px, @(yAxisTitle.Y)px) rotate(@(Data.Data.Theme.Axis.Title.Y.Angle)deg);" class="axisTitleY">@Data.YLab.text</text>
+        <text style="transform: translate(@(yAxisTitle.X.ToString (CultureInfo.InvariantCulture))px, @(yAxisTitle.Y.ToString (CultureInfo.InvariantCulture))px) rotate(@(Data.Data.Theme.Axis.Title.Y.Angle.ToString (CultureInfo.InvariantCulture))deg);" class="axisTitleY">@Data.YLab.text</text>
     </g>
 }
 
 @if (Last && Plot.Caption.Width > 0)
 {
     <g clip-path="url(#@(Plot.Id)-plot)">
-        <text x=@(Area.X + Area.Width - Plot.Theme.Plot.Caption.Margin.Right) y=@Plot.Caption.Y class="caption">@Plot.Data.Caption</text>
+        <text x=@((Area.X + Area.Width - Plot.Theme.Plot.Caption.Margin.Right).ToString(CultureInfo.InvariantCulture)) 
+              y=@Plot.Caption.Y.ToString(CultureInfo.InvariantCulture)
+              class="caption">@Plot.Data.Caption</text>
     </g>
 }
 
