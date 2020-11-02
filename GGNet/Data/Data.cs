@@ -19,7 +19,7 @@ namespace GGNet
         }
 
         public string Id { get; }
-        
+
         internal string Title { get; set; }
 
         internal string SubTitle { get; set; }
@@ -390,26 +390,17 @@ namespace GGNet
 
         protected void RunLegend(bool first)
         {
-            if (Faceting == null)
+            for (int p = 0; p < Panels.Count; p++)
             {
-                for (int p = 0; p < Panels.Count; p++)
-                {
-                    var panel = Panels[p];
-
-                    for (int g = 0; g < panel.Geoms.Count; g++)
-                    {
-                        panel.Geoms[g].Legend();
-                    }
-                }
-            }
-            else
-            {
-                var panel = Panels[0];
+                var panel = Panels[p];
 
                 for (int g = 0; g < panel.Geoms.Count; g++)
                 {
                     panel.Geoms[g].Legend();
                 }
+
+                if (Faceting != null)
+                    return;
             }
         }
 
@@ -522,7 +513,7 @@ namespace GGNet
         #region IData
 
         public Type PlotType => typeof(Components.Plot<T, TX, TY>);
-        
+
         #endregion
     }
 }
