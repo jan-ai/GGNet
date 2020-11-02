@@ -129,6 +129,9 @@ namespace GGNet.Scales
             var to = 0.0;
             var by = 0.0;
 
+            if (dmax == dmin)
+                return new[] { dmin };
+
             if (dmax - dmin < eps)
             {
                 //return(seq(from=dmin, to=dmax, length.out=m))
