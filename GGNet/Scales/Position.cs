@@ -62,11 +62,11 @@ namespace GGNet.Scales
 
         public virtual void Shape(double min, double max)
         {
-            _min ??= min;
-            _max ??= max;
+            if (!double.IsNaN(min))
+                _min = Min(_min ?? min, min);
 
-            _min = Min(_min.Value, min);
-            _max = Max(_max.Value, max);
+            if (!double.IsNaN(max))
+                _max = Max(_max ?? max, max);
         }
 
         public virtual double Coord(double value)

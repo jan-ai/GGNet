@@ -32,14 +32,19 @@ namespace GGNet.Components
         {
             sb.Clear();
 
+            var op = "M ";
             for (var j = 0; j < path.Points.Count; j++)
             {
                 var (x, y) = path.Points[j];
 
-                sb.Append(j == 0 ? "M " : " L ");
+                if (double.IsNaN(y))
+                    continue;
+
+                sb.Append(op);
                 sb.Append(Coord.CoordX(x).ToString(CultureInfo.InvariantCulture));
                 sb.Append(" ");
                 sb.Append(Coord.CoordY(y).ToString(CultureInfo.InvariantCulture));
+                op = " L ";
             }
 
             return sb.ToString();
