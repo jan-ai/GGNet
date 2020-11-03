@@ -52,6 +52,7 @@ namespace GGNet.Components
         private Zone yAxisTitle;
 
         private Zone xAxisText;
+        private Zone xAxisSubText;
         private Zone xAxisTitle;
 
         public Zone Area;
@@ -158,11 +159,6 @@ namespace GGNet.Components
             {
                 var xTitlesHeight = Data.XLab.height;
 
-                if (Data.X.Titles.Any())
-                {
-                    xTitlesHeight = Max(xTitlesHeight, Data.Data.Theme.Axis.Title.X.Size.Height());
-                }
-
                 if (xTitlesHeight > 0.0)
                 {
                     xAxisTitle.X = Area.X + Area.Width - Data.Data.Theme.Axis.Title.X.Margin.Right;
@@ -173,12 +169,20 @@ namespace GGNet.Components
                     Area.Height -= xAxisTitle.Height;
                 }
 
-                var axisHeight = Data.Data.Axis.height;
+                if (Data.X.Titles.Any())
+                {
+                    xAxisSubText.X = Area.X + Area.Width - Data.Data.Theme.Axis.Title.X.Margin.Right;
+                    xAxisSubText.Y = Area.Y + Area.Height - Data.Data.Theme.Axis.Title.X.Margin.Bottom;
+                    xAxisSubText.Width = Data.Data.Theme.Axis.Title.X.Margin.Left + Area.Width + Data.Data.Theme.Axis.Title.X.Margin.Right;
+                    xAxisSubText.Height = Data.Data.Theme.Axis.Title.X.Margin.Top + xTitlesHeight + Data.Data.Theme.Axis.Title.X.Margin.Bottom;
+
+                    Area.Height -= xAxisSubText.Height;
+                }
 
                 xAxisText.X = Area.X;
                 xAxisText.Y = Area.Y + Area.Height - Data.Data.Theme.Axis.Text.X.Margin.Bottom;
                 xAxisText.Width = Area.Width;
-                xAxisText.Height = Data.Data.Theme.Axis.Text.X.Margin.Top + axisHeight + Data.Data.Theme.Axis.Text.X.Margin.Bottom;
+                xAxisText.Height = Data.Data.Theme.Axis.Text.X.Margin.Top + Data.Data.Axis.height + Data.Data.Theme.Axis.Text.X.Margin.Bottom;
 
                 Area.Height -= xAxisText.Height;
             }
