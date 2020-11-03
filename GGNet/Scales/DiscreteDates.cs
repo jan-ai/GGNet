@@ -42,105 +42,33 @@ namespace GGNet.Scales
             var titles = new List<(double x, string month)>();
 
             var mfirst = -1;
-            var mlast = -1;
+            int? month = null;
 
-            var month = 0;
-
+            var j = 1;
             for (int i = start; i < end; i++)
             {
                 var date = values[i];
 
                 if (date.Month != month)
                 {
-                    if (mlast >= 0)
+                    if (month.HasValue)
                     {
-                        if (mlast != mfirst)
-                        {
-                            titles.Add(((mlast + mfirst) / 2.0, Abbreviations[month - 1]));
-                        }
-
-                        labels.Add((i, date.Day.ToString()));
-                        breaks.Add(i);
+                        titles.Add(((i - 1 + mfirst) / 2.0, Abbreviations[month.Value - 1]));
                     }
 
                     month = date.Month;
-
                     mfirst = i;
                 }
 
-                mlast = i;
-            }
-
-            if (mlast >= 0 && mlast != mfirst)
-            {
-                titles.Add(((mlast + mfirst) / 2.0, Abbreviations[month - 1]));
-            }
-
-            if (breaks.Count == 0)
-            {
-                var j = 1;
-                var i = end - 1;
-                while (i >= start)
+                if (j++ % delta == 0)
                 {
-                    if (j++ % delta == 0)
-                    {
-                        labels.Add((i, values[i].Day.ToString()));
-                        breaks.Add(i);
-                    }
-
-                    i--;
+                    labels.Add((i, date.Day.ToString()));
+                    breaks.Add(i);
                 }
             }
-            else
-            {
-                var n = breaks.Count;
 
-                var last = (int)breaks[^1];
-
-                var j = 1;
-                var i = (int)breaks[0] - 1;
-                while (i >= start)
-                {
-                    if (j++ % delta == 0)
-                    {
-                        labels.Add((i, values[i].Day.ToString()));
-                        breaks.Add(i);
-                    }
-
-                    i--;
-                }
-
-                for (i = 1; i < n; i++)
-                {
-                    mfirst = (int)breaks[i - 1];
-                    mlast = (int)breaks[i];
-
-                    j = 1;
-                    for (var k = mfirst + 1; k < mlast; k++)
-                    {
-                        if (j % delta == 0 && (mlast - k) >= 2)
-                        {
-                            labels.Add((k, values[k].Day.ToString()));
-                            breaks.Add(k);
-                        }
-
-                        j++;
-                    }
-                }
-
-                j = 1;
-                i = last + 1;
-                while (i <= end)
-                {
-                    if (j++ % delta == 0)
-                    {
-                        labels.Add((i, values[i].Day.ToString()));
-                        breaks.Add(i);
-                    }
-
-                    i++;
-                }
-            }
+            if (month.HasValue)
+                titles.Add(((end - 1 + mfirst) / 2.0, Abbreviations[month.Value - 1]));
 
             Breaks = breaks;
             Labels = labels;
@@ -150,16 +78,13 @@ namespace GGNet.Scales
         protected void MonthYear(int start, int end)
         {
             var yfirst = -1;
-            var ylast = -1;
-
             var mfirst = -1;
-            var mlast = -1;
 
-            var year = 0;
-            var month = 0;
+            int? year = null;
+            int? month = null;
 
-            var months = new List<(double x, string month)>();
-            var labels = new List<double>();
+            var labels = new List<(double x, string month)>();
+            var breaks = new List<double>();
             var titles = new List<(double x, string year)>();
 
             for (int i = start; i < end; i++)
@@ -168,69 +93,42 @@ namespace GGNet.Scales
 
                 if (date.Year != year)
                 {
-                    if (ylast >= 0 && ylast != yfirst)
-                    {
-                        titles.Add(((ylast + yfirst) / 2.0, year.ToString()));
-                    }
+                    if (year.HasValue)
+                        titles.Add(((i - 1 + yfirst) / 2.0, year.ToString()));
 
                     year = date.Year;
-
                     yfirst = i;
                 }
 
                 if (date.Month != month)
                 {
-                    if (mlast >= 0 && mlast != mfirst)
+                    if (month.HasValue)
                     {
-                        var label = Abbreviations[month - 1];
+                        var label = Abbreviations[month.Value - 1];
 
-                        if (mfirst > 0)
-                        {
-                            months.Add(((mlast + mfirst) / 2.0, label));
-                            labels.Add(mlast);
-                        }
-                        else
-                        {
-                            months.Add(((mlast + mfirst) / 2.0, label));
-
-                            labels.Add(mlast);
-                        }
+                        labels.Add(((i - 1 + mfirst) / 2.0, label));
+                        breaks.Add(i - 1);
                     }
 
                     month = date.Month;
-
                     mfirst = i;
                 }
-
-                ylast = i;
-                mlast = i;
             }
 
-            if (ylast >= 0 && ylast != yfirst)
-            {
-                titles.Add(((ylast + yfirst) / 2.0, year.ToString()));
-            }
+            titles.Add(((end - 1 + yfirst) / 2.0, year.ToString()));
+            labels.Add(((end - 1 + mfirst) / 2.0, Abbreviations[month.Value - 1]));
 
-            if (mlast >= 0 && mlast != mfirst)
-            {
-                months.Add(((mlast + mfirst) / 2.0, Abbreviations[month - 1]));
-            }
-
-            Breaks = labels;
-            Labels = months;
+            Breaks = breaks;
+            Labels = labels;
             Titles = titles;
         }
 
         protected void QuarterYear(int start, int end)
         {
             var yfirst = -1;
-            var ylast = -1;
 
-            var mfirst = -1;
-            var mlast = -1;
-
-            var year = 0;
-            var month = 0;
+            int? year = null;
+            int? month = null;
 
             var breaks = new List<double>();
             var labels = new List<(double x, string quarter)>();
@@ -242,45 +140,31 @@ namespace GGNet.Scales
 
                 if (date.Year != year)
                 {
-                    if (ylast >= 0 && ylast != yfirst)
-                    {
-                        titles.Add(((ylast + yfirst) / 2.0, year.ToString()));
-                    }
+                    if (year.HasValue)
+                        titles.Add(((i - 1 + yfirst) / 2.0, year.ToString()));
 
                     year = date.Year;
-
                     yfirst = i;
                 }
 
                 if (date.Month != month)
                 {
-                    if (mlast >= 0 && mlast != mfirst)
+                    if (month.HasValue)
                     {
-                        var label = Abbreviations[month - 1];
+                        var label = Abbreviations[month.Value - 1];
 
-                        if (mfirst > 0)
+                        if (month % 3 == 0)
                         {
-                            if (month % 3 == 0)
-                            {
-                                labels.Add((mlast, label));
-                                breaks.Add(mlast);
-                            }
+                            labels.Add((i - 1, label));
+                            breaks.Add(i - 1);
                         }
                     }
 
                     month = date.Month;
-
-                    mfirst = i;
                 }
-
-                ylast = i;
-                mlast = i;
             }
 
-            if (ylast >= 0 && ylast != yfirst)
-            {
-                titles.Add(((ylast + yfirst) / 2.0, year.ToString()));
-            }
+            titles.Add(((end - 1 + yfirst) / 2.0, year.ToString()));
 
             Breaks = breaks;
             Labels = labels;
