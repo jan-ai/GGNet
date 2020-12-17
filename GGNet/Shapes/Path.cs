@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using GGNet.Scales;
 
 namespace GGNet.Shapes
 {
@@ -17,5 +18,14 @@ namespace GGNet.Shapes
         private static readonly Comparer comparer = new Comparer();
 
         public Elements.Line Aesthetic { get; set; }
+
+        public override void Scale<TX, TY>(Position<TX> ScaleX, Position<TY> ScaleY)
+        {
+            for (var i = 0; i < Points.Count; i++)
+            {
+                var (x, y)= Points[i];
+                Points[i] = (ScaleX.Coord(x), ScaleY.Coord(y));
+            }
+        }
     }
 }

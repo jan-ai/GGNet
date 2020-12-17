@@ -128,7 +128,7 @@ namespace GGNet.Geoms
             });
         }
 
-        protected override void Shape(T item, bool flip)
+        protected override void Shape(T item)
         {
             var fill = Aesthetic.Fill;
 
@@ -167,7 +167,7 @@ namespace GGNet.Geoms
             violin.Add((y, Selectors.Width(item)));
         }
 
-        private void Identity(bool flip)
+        private void Identity()
         {
             foreach (var xviolins in violins)
             {
@@ -239,7 +239,7 @@ namespace GGNet.Geoms
             }
         }
 
-        private void Dodge(bool flip)
+        private void Dodge()
         {
             var delta = 0.8;
 
@@ -337,15 +337,15 @@ namespace GGNet.Geoms
             }
         }
 
-        protected override void Set(bool flip)
+        protected override void Set()
         {
             if (position == PositionAdjustment.Identity)
             {
-                Identity(flip);
+                Identity();
             }
             else if (position == PositionAdjustment.Dodge)
             {
-                Dodge(flip);
+                Dodge();
             }
             else
             {

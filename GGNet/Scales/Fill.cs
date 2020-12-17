@@ -140,6 +140,9 @@ namespace GGNet.Scales
 
             var extended = Wilkinson.extended(limits.min, limits.max, m, true);
 
+            if (extended == null)
+                return;
+
             var labels = new (string value, string label)[extended.Length];
             var breaks = new string[extended.Length];
 

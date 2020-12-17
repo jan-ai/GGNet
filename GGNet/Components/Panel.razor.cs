@@ -2,16 +2,11 @@
 
 using Microsoft.AspNetCore.Components;
 
-using GGNet.Scales;
-
-using static System.Math;
-
 using static GGNet.Position;
-using GGNet.Transformations;
 
 namespace GGNet.Components
 {
-    public partial class Panel<T, TX, TY> : ComponentBase, ICoord, IPanel
+    public partial class Panel<T, TX, TY> : ComponentBase, IPanel
         where TX : struct
         where TY : struct
     {
@@ -34,6 +29,12 @@ namespace GGNet.Components
         public double Height { get; set; }
 
         [Parameter]
+        public double XAxisSpace { get; set; }
+
+        [Parameter]
+        public double YAxisSpace { get; set; }
+
+        [Parameter]
         public bool First { get; set; }
 
         [Parameter]
@@ -41,9 +42,6 @@ namespace GGNet.Components
 
         private RenderChildPolicyBase policy;
         private RenderChildPolicyBase areaPolicy;
-
-        private Position<TX> xscale;
-        private Position<TY> yscale;
 
         private Zone xStrip;
         private Zone yStrip;
@@ -59,7 +57,7 @@ namespace GGNet.Components
 
         protected Tooltips.Plot tooltip;
         public ITooltip Tooltip => tooltip;
-
+        
         protected string clip;
 
         protected bool firstRender = true;
@@ -72,9 +70,6 @@ namespace GGNet.Components
             areaPolicy = Plot.Policy.Child();
 
             clip = Plot.Id + "-" + Data.Id;
-
-            xscale = Data.X;
-            yscale = Data.Y;
         }
 
         protected void Render(bool firstRender)
@@ -111,15 +106,20 @@ namespace GGNet.Components
                 Area.Width -= yStrip.Width;
             }
 
-            if (Data.Axis.y)
+            if (Data.Data.Theme.Axis.Y == Left)
             {
-                var axisWidth = Data.Data.Axis.width;
+                Area.X += YAxisSpace;
+            }
+
+            if (Data.yAxis.Show)
+            {
+                var axisWidth = Data.yAxis.Width;
 
                 if (Data.Data.Theme.Axis.Y == Left)
                 {
-                    if (Data.YLab.width > 0.0 || Data.Y.Titles.Any())
+                    if (Data.YLab.width > 0.0 || Data.yAxis.Titles.Any())
                     {
-                        yAxisTitle.X = Area.X + Data.Data.Theme.Axis.Title.Y.Margin.Left + Data.YLab.width;
+                        yAxisTitle.X = Area.X + Data.Data.Theme.Axis.Title.Y.Margin.Left + Data.YLab.width - YAxisSpace;
                         yAxisTitle.Y = Area.Y + Data.Data.Theme.Axis.Title.Y.Margin.Bottom;
                         yAxisTitle.Width = Data.Data.Theme.Axis.Title.Y.Margin.Left + Data.YLab.width + Data.Data.Theme.Axis.Title.Y.Margin.Right;
                         yAxisTitle.Height = Area.Height;
@@ -128,16 +128,13 @@ namespace GGNet.Components
                         Area.Width -= yAxisTitle.Width;
                     }
 
-                    yAxisText.X = Area.X + Data.Data.Theme.Axis.Text.Y.Margin.Left + axisWidth;
+                    yAxisText.X = Area.X - Data.Data.Theme.Axis.Text.Y.Margin.Right;
                     yAxisText.Y = Area.Y;
-                    yAxisText.Width = Data.Data.Theme.Axis.Text.Y.Margin.Left + axisWidth + Data.Data.Theme.Axis.Text.Y.Margin.Right;
-
-                    Area.X += yAxisText.Width;
-                    Area.Width -= yAxisText.Width;
+                    yAxisText.Width = YAxisSpace;
                 }
                 else if (Data.Data.Theme.Axis.Y == Right)
                 {
-                    if (Data.YLab.width > 0.0 || Data.Y.Titles.Any())
+                    if (Data.YLab.width > 0.0 || Data.yAxis.Titles.Any())
                     {
                         yAxisTitle.X = Area.X + Area.Width - Data.YLab.width - Data.Data.Theme.Axis.Title.Y.Margin.Right;
                         yAxisTitle.Y = Area.Y + Data.Data.Theme.Axis.Title.Y.Margin.Bottom;
@@ -147,32 +144,30 @@ namespace GGNet.Components
                         Area.Width -= yAxisTitle.Width;
                     }
 
-                    yAxisText.X = Area.X + Area.Width - axisWidth;
+                    yAxisText.X = Area.X + Area.Width + Data.Data.Theme.Axis.Text.Y.Margin.Left;
                     yAxisText.Y = Area.Y;
-                    yAxisText.Width = Data.Data.Theme.Axis.Text.Y.Margin.Left + axisWidth + Data.Data.Theme.Axis.Text.Y.Margin.Right;
-
-                    Area.Width -= yAxisText.Width;
+                    yAxisText.Width = axisWidth;
                 }
             }
 
-            if (Data.Axis.x)
+            if (Data.xAxis.Show)
             {
                 var xTitlesHeight = Data.XLab.height;
 
                 if (xTitlesHeight > 0.0)
                 {
                     xAxisTitle.X = Area.X + Area.Width - Data.Data.Theme.Axis.Title.X.Margin.Right;
-                    xAxisTitle.Y = Area.Y + Area.Height - Data.Data.Theme.Axis.Title.X.Margin.Bottom;
+                    xAxisTitle.Y = Area.Y + Area.Height + XAxisSpace- Data.Data.Theme.Axis.Title.X.Margin.Bottom;
                     xAxisTitle.Width = Data.Data.Theme.Axis.Title.X.Margin.Left + Area.Width + Data.Data.Theme.Axis.Title.X.Margin.Right;
                     xAxisTitle.Height = Data.Data.Theme.Axis.Title.X.Margin.Top + xTitlesHeight + Data.Data.Theme.Axis.Title.X.Margin.Bottom;
 
                     Area.Height -= xAxisTitle.Height;
                 }
 
-                if (Data.X.Titles.Any())
+                if (Data.xAxis.Titles.Any())
                 {
                     xAxisSubText.X = Area.X + Area.Width - Data.Data.Theme.Axis.Title.X.Margin.Right;
-                    xAxisSubText.Y = Area.Y + Area.Height - Data.Data.Theme.Axis.Title.X.Margin.Bottom;
+                    xAxisSubText.Y = Area.Y + Area.Height + XAxisSpace - Data.Data.Theme.Axis.Title.X.Margin.Bottom;
                     xAxisSubText.Width = Data.Data.Theme.Axis.Title.X.Margin.Left + Area.Width + Data.Data.Theme.Axis.Title.X.Margin.Right;
                     xAxisSubText.Height = Data.Data.Theme.Axis.Title.X.Margin.Top + xTitlesHeight + Data.Data.Theme.Axis.Title.X.Margin.Bottom;
 
@@ -180,11 +175,9 @@ namespace GGNet.Components
                 }
 
                 xAxisText.X = Area.X;
-                xAxisText.Y = Area.Y + Area.Height - Data.Data.Theme.Axis.Text.X.Margin.Bottom;
+                xAxisText.Y = Area.Y + Area.Height + XAxisSpace - Data.Data.Theme.Axis.Text.X.Margin.Bottom;
                 xAxisText.Width = Area.Width;
-                xAxisText.Height = Data.Data.Theme.Axis.Text.X.Margin.Top + Data.Data.Axis.height + Data.Data.Theme.Axis.Text.X.Margin.Bottom;
-
-                Area.Height -= xAxisText.Height;
+                xAxisText.Height = Data.Data.Theme.Axis.Text.X.Margin.Top + Data.xAxis.Height + Data.Data.Theme.Axis.Text.X.Margin.Bottom;
             }
 
             if (xStrip.Width > 0)
@@ -206,17 +199,5 @@ namespace GGNet.Components
         public void Refresh() => policy.Refresh();
 
         protected override bool ShouldRender() => policy.ShouldRender();
-
-        public double CoordX(double value) => Area.X + xscale.Coord(value) * Area.Width;
-
-        public (double min, double max) XRange => xscale.Range;
-
-        public ITransformation<double> XTransformation => xscale.RangeTransformation;
-
-        public double CoordY(double value) => Area.Y + (1 - yscale.Coord(value)) * Area.Height;
-
-        public (double min, double max) YRange => yscale.Range;
-
-        public ITransformation<double> YTransformation => yscale.RangeTransformation;
     }
 }

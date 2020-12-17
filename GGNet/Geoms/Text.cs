@@ -107,7 +107,7 @@ namespace GGNet.Geoms
             Positions.Y.Train(item);
         }
 
-        protected override void Shape(T item, bool flip)
+        protected override void Shape(T item)
         {
             var value = Selectors.Text(item)?.ToString();
             if (string.IsNullOrEmpty(value))

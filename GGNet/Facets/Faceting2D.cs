@@ -47,9 +47,9 @@ namespace GGNet.Facets
             columns.Clear();
         }
 
-        public override (Facet<T> facet, bool showX, bool showY)[] Facets(Theme theme)
+        public override Facet<T>[] Facets()
         {
-            var facets = new (Facet<T> facet, bool showX, bool showY)[N];
+            var facets = new Facet<T>[N];
 
             var i = 0;
 
@@ -65,13 +65,7 @@ namespace GGNet.Facets
                         ? rows[r].ToString()
                         : string.Empty;
 
-                    var showY = theme.Axis.Y == Position.Left
-                        ? c == 0
-                        : c == (NColumns - 1);
-
-                    var showX = r == (NRows - 1);
-
-                    facets[i++] = (new Facet<T>(this, (r, c), xStrip, yStrip), showX, showY);
+                    facets[i++] = new Facet<T>(this, (r, c), xStrip, yStrip);
                 }
             }
 

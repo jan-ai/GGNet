@@ -87,8 +87,8 @@ namespace GGNet.Geoms
                     if (point != null)
                     {
                         panel.Component.Tooltip.Show(
-                            point.Longitude,
-                            point.Latitude, 
+                            Positions.X.Position.Coord(point.Longitude),
+                            Positions.Y.Position.Coord(point.Latitude),
                             0,
                             content,
                             Aesthetics.Fill?.Map(item) ?? Aesthetic.Fill,
@@ -130,7 +130,7 @@ namespace GGNet.Geoms
             });
         }
 
-        protected override void Shape(T item, bool flip)
+        protected override void Shape(T item)
         {
             var fill = Aesthetic.Fill;
 

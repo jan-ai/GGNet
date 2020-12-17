@@ -1,4 +1,6 @@
-﻿namespace GGNet.Shapes
+﻿using GGNet.Scales;
+
+namespace GGNet.Shapes
 {
     public class Line : Shape
     {
@@ -11,6 +13,14 @@
         public double Y2 { get; set; }
 
         public Elements.Line Aesthetic { get; set; }
+
+        public override void Scale<TX, TY>(Position<TX> ScaleX, Position<TY> ScaleY)
+        {
+            X1 = ScaleX.Coord(X1);
+            X2 = ScaleX.Coord(X2);
+            Y1 = ScaleY.Coord(Y1);
+            Y2 = ScaleY.Coord(Y2);
+        }
     }
 
     public class VLine : Shape
@@ -22,6 +32,11 @@
         public Elements.Line Line { get; set; }
 
         public Elements.Text Text { get; set; }
+
+        public override void Scale<TX, TY>(Position<TX> ScaleX, Position<TY> ScaleY)
+        {
+            X = ScaleX.Coord(X);
+        }
     }
 
     public class HLine : Shape
@@ -33,6 +48,11 @@
         public Elements.Line Line { get; set; }
 
         public Elements.Text Text { get; set; }
+
+        public override void Scale<TX, TY>(Position<TX> ScaleX, Position<TY> ScaleY)
+        {
+            Y = ScaleY.Coord(Y);
+        }
     }
 
     public class ABLine : Shape
@@ -48,5 +68,8 @@
         public Elements.Line Line { get; set; }
 
         public Elements.Text Text { get; set; }
+        public override void Scale<TX, TY>(Position<TX> ScaleX, Position<TY> ScaleY)
+        {
+        }
     }
 }

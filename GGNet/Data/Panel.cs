@@ -6,22 +6,25 @@ namespace GGNet
     using Scales;
     using Facets;
     using Geoms;
+    using GGNet.Coords;
+    using GGNet.Data;
+    using System.Linq;
 
     public partial class Data<T, TX, TY>
     {
         public class Panel
         {
-            public Panel((int row, int col) coord, Data<T, TX, TY> data, double width, double height)
+            public Panel((int row, int col) pos, Data<T, TX, TY> data, double width, double height)
             {
-                Coord = coord;
                 Data = data;
+                Position = pos;
                 Width = width;
                 Height = height;
 
-                Id = $"{coord.row}_{coord.col}";
+                Id = $"{Position.row}_{Position.col}";
             }
 
-            public (int row, int col) Coord { get; }
+            public (int row, int col) Position { get; }
 
             public Data<T, TX, TY> Data { get; }
 
@@ -35,8 +38,6 @@ namespace GGNet
 
             internal (string x, string y) Strip { get; set; }
 
-            internal (bool x, bool y) Axis { get; set; }
-
             internal (double height, string text) XLab { get; set; }
 
             internal (double width, string text) YLab { get; set; }
@@ -48,6 +49,10 @@ namespace GGNet
                 Component = component;
             }
 
+            internal Axis xAxis = new Axis ();
+
+            internal Axis yAxis = new Axis ();
+
             internal Position<TX> X
             {
                 get
@@ -58,7 +63,7 @@ namespace GGNet
                     }
                     else
                     {
-                        return Data.Positions.X.Scales[Coord.row * Data.N.cols + Coord.col];
+                        return Data.Positions.X.Scales[Position.row * Data.Coord.PanelColumns(Data) + Position.col];
                     }
                 }
             }
@@ -73,7 +78,66 @@ namespace GGNet
                     }
                     else
                     {
-                        return Data.Positions.Y.Scales[Coord.row * Data.N.cols + Coord.col];
+                        return Data.Positions.Y.Scales[Position.row * Data.Coord.PanelColumns(Data) + Position.col];
+                    }
+                }
+            }
+
+            public void Render (bool first)
+            {
+                if (X != null)
+                {
+                    var _xAxis = Data.Coord.XAxis(this);
+
+                    _xAxis.Breaks = X.Breaks.Select(b => X.Coord(b));
+                    _xAxis.MinorBreaks = X.MinorBreaks.Select(b => X.Coord(b));
+                    _xAxis.Labels = X.Labels.Select(l => (X.Coord(l.value), l.label));
+                    _xAxis.Titles = X.Titles.Select(t => (X.Coord(t.value), t.title));
+                }
+
+                if (Y != null)
+                {
+                    var _yAxis = Data.Coord.YAxis(this);
+
+                    _yAxis.Breaks = Y.Breaks.Select(b => Y.Coord(b));
+                    _yAxis.MinorBreaks = Y.MinorBreaks.Select(b => Y.Coord(b));
+                    _yAxis.Labels = Y.Labels.Select(l => (Y.Coord(l.value), l.label));
+                    _yAxis.Titles = Y.Titles.Select(t => (Y.Coord(t.value), t.title));
+                }
+
+                xAxis.Height = 0.0;
+                xAxis.TitlesSize = 0.0;
+
+                if (Data.grid)
+                {
+                    foreach (var (_, label) in xAxis.Labels)
+                        xAxis.Height = Math.Max(xAxis.Height, label.Height(Data.Theme.Axis.Text.X.Size));
+
+                    foreach (var (_, title) in xAxis.Titles)
+                        xAxis.TitlesSize = Math.Max(xAxis.TitlesSize, title.Height(Data.Theme.Axis.Title.X.Size));
+                }
+
+                xAxis.TitlesSize = Math.Max(xAxis.TitlesSize, Data.XLab.Height(Data.Theme.Axis.Title.X.Size));
+
+                yAxis.Width = 0.0;
+                yAxis.TitlesSize = 0.0;
+
+                if (Data.grid)
+                {
+                    foreach (var (_, label) in yAxis.Labels)
+                        yAxis.Width = Math.Max(yAxis.Width, label.Width(Data.Theme.Axis.Text.Y.Size));
+
+                    foreach (var (_, title) in yAxis.Titles)
+                        yAxis.TitlesSize = Math.Max(yAxis.TitlesSize, title.Height(Data.Theme.Axis.Title.Y.Size));
+                }
+
+                for (var g = 0; g < Geoms.Count; g++)
+                {
+                    var geom = Geoms[g];
+
+                    for (var s = 0; s < geom.Layer.Count; s++)
+                    {
+                        geom.Layer[s].Scale(X, Y);
                     }
                 }
             }
@@ -102,9 +166,9 @@ namespace GGNet
 
             public void Add(Func<Panel, Facet<T>, IGeom> geom) => geoms.Add(geom);
 
-            public Panel Build((int, int) coord, Facet<T> facet = null, double? width = null, double? height = null)
+            public Panel Build((int, int) pos, Facet<T> facet = null, double? width = null, double? height = null)
             {
-                var panel = new Panel(coord, Data, width ?? Width, height ?? Height);
+                var panel = new Panel(pos, Data, width ?? Width, height ?? Height);
 
                 foreach (var geom in geoms)
                 {

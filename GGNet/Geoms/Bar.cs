@@ -124,8 +124,8 @@ namespace GGNet.Geoms
                 onMouseOver = (item, x, y, _) =>
                 {
                     panel.Component.Tooltip.Show(
-                        x,
-                        y,
+                        Positions.X.Position.Coord(x),
+                        Positions.Y.Position.Coord(y),
                         0,
                         Selectors.Tooltip(item),
                         Aesthetics.Fill?.Map(item) ?? Aesthetic.Fill,
@@ -171,7 +171,7 @@ namespace GGNet.Geoms
             });
         }
 
-        protected override void Shape(T item, bool flip)
+        protected override void Shape(T item)
         {
             var fill = Aesthetic.Fill;
 
@@ -187,48 +187,22 @@ namespace GGNet.Geoms
             var x = Positions.X.Map(item);
             var y = Positions.Y.Map(item);
 
-            var exist = false;
+            if (double.IsNaN(x) || double.IsNaN(y))
+                return;
 
-            if (flip)
+            for (var i = 0; i < bars.Count; i++)
             {
-                for (var i = 0; i < bars.Count; i++)
+                var bar = bars[i];
+                if (bar.x == x)
                 {
-                    var bar = bars[i];
-                    if (bar.x == y)
-                    {
-                        bar.y.Add((item, fill, x));
-                        exist = true;
-                        break;
-                    }
-                }
-
-                if (!exist)
-                {
-                    var bar = new Buffer<(T item, string fill, double value)>(8, 1);
-                    bar.Add((item, fill, x));
-                    bars.Add((y, bar));
+                    bar.y.Add((item, fill, y));
+                    return;
                 }
             }
-            else
-            {
-                for (var i = 0; i < bars.Count; i++)
-                {
-                    var bar = bars[i];
-                    if (bar.x == x)
-                    {
-                        bar.y.Add((item, fill, y));
-                        exist = true;
-                        break;
-                    }
-                }
 
-                if (!exist)
-                {
-                    var bar = new Buffer<(T item, string fill, double value)>(8, 1);
-                    bar.Add((item, fill, y));
-                    bars.Add((x, bar));
-                }
-            }
+            var newBar = new Buffer<(T item, string fill, double value)>(8, 1);
+            newBar.Add((item, fill, y));
+            bars.Add((x, newBar));
         }
 
         private void Interactivity(Rectangle rect, T item, double x, double y)
@@ -249,7 +223,7 @@ namespace GGNet.Geoms
             }
         }
 
-        private void Stack(bool flip)
+        private void Stack()
         {
             var delta = width;
 
@@ -265,178 +239,125 @@ namespace GGNet.Geoms
                 delta *= d;
             }
 
-            if (flip)
+            for (var i = 0; i < bars.Count; i++)
             {
-                for (var i = 0; i < bars.Count; i++)
+                var (x, y) = bars[i];
+                var sum = 0.0;
+
+                for (var j = y.Count - 1; j >= 0; j--)
                 {
-                    var (x, y) = bars[i];
-                    var sum = 0.0;
+                    var (item, fill, value) = y[j];
 
-                    for (var j = y.Count - 1; j >= 0; j--)
+                    var rect = new Rectangle
                     {
-                        var (item, fill, value) = y[j];
-
-                        var rect = new Rectangle
+                        Classes = animation ? "animate-bar" : string.Empty,
+                        X = x - delta / 2.0,
+                        Y = sum,
+                        Width = delta,
+                        Height = value,
+                        Aesthetic = new Elements.Rectangle
                         {
-                            Classes = animation ? "animate-bar" : string.Empty,
-                            X = sum,
-                            Y = x - delta / 2.0,
-                            Width = value,
-                            Height = delta,
-                            Aesthetic = new Elements.Rectangle
-                            {
-                                Fill = fill,
-                                Alpha = Aesthetic.Alpha
-                            }
-                        };
+                            Fill = fill,
+                            Alpha = Aesthetic.Alpha
+                        }
+                    };
 
-                        Interactivity(rect, item, sum + value, x);
+                    Layer.Add(rect);
 
-                        Layer.Add(rect);
+                    Interactivity(rect, item, x, sum + value);
 
-                        sum += value;
-                    }
-
-                    if (scale.x)
-                    {
-                        Positions.X.Position.Shape(0, sum);
-                    }
-
-                    if (scale.y)
-                    {
-                        Positions.Y.Position.Shape(x - delta, x + delta);
-                    }
+                    sum += value;
                 }
-            }
-            else
-            {
-                for (var i = 0; i < bars.Count; i++)
+
+                if (scale.x)
                 {
-                    var (x, y) = bars[i];
-                    var sum = 0.0;
+                    Positions.X.Position.Shape(x - delta, x + delta);
+                }
 
-                    for (var j = y.Count - 1; j >= 0; j--)
-                    {
-                        var (item, fill, value) = y[j];
-
-                        var rect = new Rectangle
-                        {
-                            Classes = animation ? "animate-bar" : string.Empty,
-                            X = x - delta / 2.0,
-                            Y = sum,
-                            Width = delta,
-                            Height = value,
-                            Aesthetic = new Elements.Rectangle
-                            {
-                                Fill = fill,
-                                Alpha = Aesthetic.Alpha
-                            }
-                        };
-
-                        Layer.Add(rect);
-
-                        Interactivity(rect, item, x, sum + value);
-
-                        sum += value;
-                    }
-
-                    if (scale.x)
-                    {
-                        Positions.X.Position.Shape(x - delta, x + delta);
-                    }
-
-                    if (scale.y)
-                    {
-                        Positions.Y.Position.Shape(0, sum);
-                    }
+                if (scale.y)
+                {
+                    Positions.Y.Position.Shape(0, sum);
                 }
             }
         }
 
-        private void Dodge(bool flip)
+        private void Dodge()
         {
-            if (flip)
-            {
-                throw new NotImplementedException();
-            }
-            else
-            {
-                var delta = width;
+            var delta = width;
 
-                if (bars.Count > 1)
+            if (bars.Count > 1)
+            {
+                var d = double.MaxValue;
+
+                for (var i = 1; i < bars.Count; i++)
                 {
-                    var d = double.MaxValue;
-
-                    for (var i = 1; i < bars.Count; i++)
-                    {
-                        d = Math.Min(d, bars[i].x - bars[i - 1].x);
-                    }
-
-                    delta *= d;
+                    d = Math.Min(d, bars[i].x - bars[i - 1].x);
                 }
 
-                for (var i = 0; i < bars.Count; i++)
+                delta *= d;
+            }
+
+            for (var i = 0; i < bars.Count; i++)
+            {
+                var bar = bars[i];
+                var n = bar.y.Count;
+
+                var w = delta / n;
+                var x = bar.x - delta / 2.0;
+
+                for (var j = 0; j < n; j++)
                 {
-                    var bar = bars[i];
-                    var n = bar.y.Count;
+                    var (item, fill, value) = bar.y[j];
 
-                    var w = delta / n;
-                    var x = bar.x - delta / 2.0;
-
-                    for (var j = 0; j < n; j++)
+                    var rect = new Rectangle
                     {
-                        var (item, fill, value) = bar.y[j];
-
-                        var rect = new Rectangle
+                        Classes = animation ? "animate-bar" : string.Empty,
+                        X = x,
+                        Y = value >= 0 ? 0 : value,
+                        Width = w,
+                        Height = Math.Abs(value),
+                        Aesthetic = new Elements.Rectangle
                         {
-                            Classes = animation ? "animate-bar" : string.Empty,
-                            X = x,
-                            Y = value >= 0 ? 0 : value,
-                            Width = w,
-                            Height = Math.Abs(value),
-                            Aesthetic = new Elements.Rectangle
-                            {
-                                Fill = fill,
-                                Alpha = Aesthetic.Alpha
-                            }
-                        };
-
-                        Interactivity(rect, item, x + w / 2.0, value);
-
-                        Layer.Add(rect);
-
-                        if (scale.x)
-                        {
-                            Positions.X.Position.Shape(x, x + w);
+                            Fill = fill,
+                            Alpha = Aesthetic.Alpha
                         }
+                    };
 
-                        if (scale.y)
-                        {
-                            if (value >= 0)
-                            {
-                                Positions.Y.Position.Shape(0, value);
-                            }
-                            else
-                            {
-                                Positions.Y.Position.Shape(value, 0);
-                            }
-                        }
+                    Interactivity(rect, item, x + w / 2.0, value);
 
-                        x += w;
+                    Layer.Add(rect);
+
+                    if (scale.x)
+                    {
+                        Positions.X.Position.Shape(x, x + w);
                     }
+
+                    if (scale.y)
+                    {
+                        if (value >= 0)
+                        {
+                            Positions.Y.Position.Shape(0, value);
+                        }
+                        else
+                        {
+                            Positions.Y.Position.Shape(value, 0);
+                        }
+                    }
+
+                    x += w;
                 }
             }
         }
 
-        protected override void Set(bool flip)
+        protected override void Set()
         {
             if (position == PositionAdjustment.Stack)
             {
-                Stack(flip);
+                Stack();
             }
             else if (position == PositionAdjustment.Dodge)
             {
-                Dodge(flip);
+                Dodge();
             }
             else
             {

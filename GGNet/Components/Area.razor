@@ -12,14 +12,14 @@
 
     for (var i = 0; i < geom.Layer.Count; i++)
     {
-        var shape = geom.Layer[i];
+        var shape = Data.Data.Coord.Transform(geom.Layer[i]);
 
         if (shape is Shapes.Line l)
         {
-            <line x1=@Coord.CoordX(l.X1).ToString(CultureInfo.InvariantCulture)
-                  y1=@Coord.CoordY(l.Y1).ToString(CultureInfo.InvariantCulture)
-                  x2=@Coord.CoordX(l.X2).ToString(CultureInfo.InvariantCulture)
-                  y2=@Coord.CoordY(l.Y2).ToString(CultureInfo.InvariantCulture)
+            <line x1=@Zone.CoordX(l.X1).ToString(CultureInfo.InvariantCulture)
+                  y1=@Zone.CoordY(l.Y1).ToString(CultureInfo.InvariantCulture)
+                  x2=@Zone.CoordX(l.X2).ToString(CultureInfo.InvariantCulture)
+                  y2=@Zone.CoordY(l.Y2).ToString(CultureInfo.InvariantCulture)
                   class=@l.Css()
                   stroke-width=@l.Aesthetic.Width.ToString(CultureInfo.InvariantCulture)
                   stroke=@l.Aesthetic.Fill
@@ -32,10 +32,10 @@
         }
         else if (shape is Shapes.Rectangle r)
         {
-            var x = Coord.CoordX(r.X);
-            var y = Coord.CoordY(r.Y + r.Height);
-            var width = Coord.CoordX(r.X + r.Width) - x;
-            var height = Coord.CoordY(r.Y) - y;
+            var x = Zone.CoordX(r.X);
+            var y = Zone.CoordY(r.Y + r.Height);
+            var width = Zone.CoordX(r.X + r.Width) - x;
+            var height = Zone.CoordY(r.Y) - y;
 
             <rect x=@x.ToString(CultureInfo.InvariantCulture)
                   y=@y.ToString(CultureInfo.InvariantCulture)
@@ -51,7 +51,7 @@
         }
         else if (shape is Shapes.Circle c)
         {
-            <g style="transform: translate(@Coord.CoordX(c.X).ToString(CultureInfo.InvariantCulture)px, @Coord.CoordY(c.Y).ToString(CultureInfo.InvariantCulture)px)">
+            <g style="transform: translate(@Zone.CoordX(c.X).ToString(CultureInfo.InvariantCulture)px, @Zone.CoordY(c.Y).ToString(CultureInfo.InvariantCulture)px)">
                 <circle cx="0"
                         cy="0"
                         r=@c.Aesthetic.Radius.ToString(CultureInfo.InvariantCulture)
@@ -68,8 +68,8 @@
         }
         else if (shape is Shapes.VStrip v)
         {
-            var x = Coord.CoordX(v.X);
-            var width = Coord.CoordY(v.X + v.Width) - x;
+            var x = Zone.CoordX(v.X);
+            var width = Zone.CoordY(v.X + v.Width) - x;
 
             <rect x=@x.ToString(CultureInfo.InvariantCulture)
                   y=@Zone.Y.ToString(CultureInfo.InvariantCulture)
@@ -133,19 +133,21 @@
         else if (shape is Shapes.Text text)
         {
             <g style="pointer-events: none;" clip-path="url(#@(Clip))">
-                <text style="fill: @text.Aesthetic.Color; text-anchor: @text.Aesthetic.Anchor; font-size: @text.Aesthetic.Size; font-weigth: @text.Aesthetic.Weight; font-style: @text.Aesthetic.Style; transform: translate(@Coord.CoordX(text.X).ToString(CultureInfo.InvariantCulture)px, @Coord.CoordY(text.Y).ToString(CultureInfo.InvariantCulture)px) rotate(@text.Aesthetic.Angle.ToString(CultureInfo.InvariantCulture)deg);">
+                <text style="fill: @text.Aesthetic.Color; text-anchor: @text.Aesthetic.Anchor; font-size: @text.Aesthetic.Size; font-weigth: @text.Aesthetic.Weight; font-style: @text.Aesthetic.Style; transform: translate(@Zone.CoordX(text.X).ToString(CultureInfo.InvariantCulture)px, @Zone.CoordY(text.Y).ToString(CultureInfo.InvariantCulture)px) rotate(@text.Aesthetic.Angle.ToString(CultureInfo.InvariantCulture)deg);">
                     @text.Value
                 </text>
             </g>
         }
         else if (shape is Shapes.VLine vline)
         {
-            var x = Coord.CoordX(vline.X);
+            var x = Zone.CoordX(vline.X);
+            var y1 = Zone.CoordY(Zone.Y);
+            var y2 = Zone.CoordY(Zone.Y + Zone.Height);
 
             <line x1=@x.ToString(CultureInfo.InvariantCulture)
-                  y1=@Zone.Y.ToString(CultureInfo.InvariantCulture)
+                  y1=@y1.ToString(CultureInfo.InvariantCulture)
                   x2=@x.ToString(CultureInfo.InvariantCulture)
-                  y2=@((Zone.Y + Zone.Height).ToString(CultureInfo.InvariantCulture))
+                  y2=@y2.ToString(CultureInfo.InvariantCulture)
                   stroke-width=@vline.Line.Width.ToString(CultureInfo.InvariantCulture)
                   stroke=@vline.Line.Fill
                   stroke-opacity=@vline.Line.Alpha.ToString(CultureInfo.InvariantCulture)
@@ -181,11 +183,13 @@
         }
         else if (shape is Shapes.HLine hline)
         {
-            var y = Coord.CoordY(hline.Y);
+            var x1 = Zone.CoordX(Zone.X);
+            var y = Zone.CoordY(hline.Y);
+            var x2 = Zone.CoordX(Zone.X + Zone.Width);
 
-            <line x1=@Zone.X.ToString(CultureInfo.InvariantCulture)
+            <line x1=@x1.ToString(CultureInfo.InvariantCulture)
                   y1=@y.ToString(CultureInfo.InvariantCulture)
-                  x2=@((Zone.X + Zone.Width).ToString (CultureInfo.InvariantCulture))
+                  x2=@x2.ToString(CultureInfo.InvariantCulture)
                   y2=@y.ToString(CultureInfo.InvariantCulture)
                   stroke-width=@hline.Line.Width.ToString(CultureInfo.InvariantCulture)
                   stroke=@hline.Line.Fill
@@ -219,12 +223,12 @@
         }
         else if (shape is Shapes.ABLine abline)
         {
-            var ymin = Coord.XRange.min;
-            var ymax = Coord.XRange.max;
+            var ymin = XRange.min;
+            var ymax = XRange.max;
             if (abline.Transformation.x)
             {
-                ymin = Coord.XTransformation.Inverse(ymin);
-                ymax = Coord.XTransformation.Inverse(ymax);
+                ymin = XTransformation.Inverse(ymin);
+                ymax = XTransformation.Inverse(ymax);
             }
 
             ymin = abline.A * ymin + abline.B;
@@ -232,16 +236,18 @@
 
             if (abline.Transformation.y)
             {
-                ymin = Coord.YTransformation.Apply(ymin);
-                ymax = Coord.YTransformation.Apply(ymax);
+                ymin = YTransformation.Apply(ymin);
+                ymax = YTransformation.Apply(ymax);
             }
 
-            var y1 = Coord.CoordY(ymin);
-            var y2 = Coord.CoordY(ymax);
+            var x1 = Zone.CoordX(Zone.X);
+            var y1 = Zone.CoordY(ymin);
+            var x2 = Zone.CoordX(Zone.X + Zone.Width);
+            var y2 = Zone.CoordY(ymax);
 
-            <line x1=@Zone.X.ToString(CultureInfo.InvariantCulture)
+            <line x1=@x1.ToString(CultureInfo.InvariantCulture)
                   y1=@y1.ToString(CultureInfo.InvariantCulture)
-                  x2=@((Zone.X + Zone.Width).ToString(CultureInfo.InvariantCulture))
+                  x2=@x2.ToString(CultureInfo.InvariantCulture)
                   y2=@y2.ToString(CultureInfo.InvariantCulture)
                   stroke-width=@abline.Line.Width.ToString(CultureInfo.InvariantCulture)
                   stroke=@abline.Line.Fill
@@ -265,48 +271,48 @@
 
                     if (angle >= 0)
                     {
-                        if (ymax > Coord.YRange.max)
+                        if (ymax > YRange.max)
                         {
-                            x = Coord.YRange.max;
+                            x = YRange.max;
 
                             if (abline.Transformation.y)
                             {
-                                x = Coord.YTransformation.Inverse(x);
+                                x = YTransformation.Inverse(x);
                             }
 
                             x = (x - abline.B) / abline.A;
 
                             if (abline.Transformation.x)
                             {
-                                x = Coord.XTransformation.Apply(x);
+                                x = XTransformation.Apply(x);
 
                             }
 
-                            x = Coord.CoordX(x);
+                            x = Zone.CoordX(x);
 
                             y = Zone.Y;
                         }
                     }
                     else
                     {
-                        if (ymax < Coord.YRange.min)
+                        if (ymax < YRange.min)
                         {
-                            x = Coord.YRange.min;
+                            x = YRange.min;
 
                             if (abline.Transformation.y)
                             {
-                                x = Coord.YTransformation.Inverse(x);
+                                x = YTransformation.Inverse(x);
                             }
 
                             x = (x - abline.B) / abline.A;
 
                             if (abline.Transformation.x)
                             {
-                                x = Coord.XTransformation.Apply(x);
+                                x = XTransformation.Apply(x);
 
                             }
 
-                            x = Coord.CoordX(x);
+                            x = Zone.CoordX(x);
 
                             y = Zone.Y + Zone.Height;
                         }
@@ -322,48 +328,48 @@
 
                     if (angle >= 0)
                     {
-                        if (ymin < Coord.YRange.min)
+                        if (ymin < YRange.min)
                         {
-                            x = Coord.YRange.min;
+                            x = YRange.min;
 
                             if (abline.Transformation.y)
                             {
-                                x = Coord.YTransformation.Inverse(x);
+                                x = YTransformation.Inverse(x);
                             }
 
                             x = (x - abline.B) / abline.A;
 
                             if (abline.Transformation.x)
                             {
-                                x = Coord.XTransformation.Apply(x);
+                                x = XTransformation.Apply(x);
 
                             }
 
-                            x = Coord.CoordX(x);
+                            x = Zone.CoordX(x);
 
                             y = Zone.Y + Zone.Height;
                         }
                     }
                     else
                     {
-                        if (ymin < Coord.YRange.max)
+                        if (ymin < YRange.max)
                         {
-                            x = Coord.YRange.max;
+                            x = YRange.max;
 
                             if (abline.Transformation.y)
                             {
-                                x = Coord.YTransformation.Inverse(x);
+                                x = YTransformation.Inverse(x);
                             }
 
                             x = (x - abline.B) / abline.A;
 
                             if (abline.Transformation.x)
                             {
-                                x = Coord.XTransformation.Apply(x);
+                                x = XTransformation.Apply(x);
 
                             }
 
-                            x = Coord.CoordX(x);
+                            x = Zone.CoordX(x);
 
                             y = Zone.Y;
                         }

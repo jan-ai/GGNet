@@ -113,7 +113,7 @@ namespace GGNet.Geoms
             });
         }
 
-        protected override void Shape(T item, bool flip)
+        protected override void Shape(T item)
         {
             Area area;
 

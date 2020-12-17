@@ -28,6 +28,6 @@
 
         public abstract void Clear();
 
-        public abstract (Facet<T> facet, bool showX, bool showY)[] Facets(Theme theme);
+        public abstract Facet<T>[] Facets();
     }
 }

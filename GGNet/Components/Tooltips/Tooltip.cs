@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using GGNet.Coords;
+using Microsoft.AspNetCore.Components;
 
 namespace GGNet.Components.Tooltips
 {
@@ -31,8 +32,7 @@ namespace GGNet.Components.Tooltips
         {
             visibility = true;
 
-            var _x = Coord.CoordX(x);
-            var _y = Coord.CoordY(y);
+            var (_x, _y) = Coord.Transform(Area, x, y);
 
             this.color = color ?? "#FFFFFF";
             this.alpha = alpha ?? 1.0;

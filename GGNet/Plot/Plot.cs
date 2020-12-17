@@ -18,6 +18,7 @@ namespace GGNet
     using static Position;
     using static Anchor;
     using static LineType;
+    using GGNet.Coords;
 
     public static class Plot
     {
@@ -455,11 +456,26 @@ namespace GGNet
             return data;
         }
 
-        public static Data<T, TX, TY> Flip<T, TX, TY>(this Data<T, TX, TY> data)
+        public static Data<T, TX, TY> Coord_Cartesian<T, TX, TY>(this Data<T, TX, TY> data, 
+            (double min, double max)? limits = null, 
+            bool expand = true, 
+            bool clip = true)
             where TX : struct
             where TY : struct
         {
-            data.Flip = true;
+            data.Coord = new Cartesian(limits, expand, clip);
+
+            return data;
+        }
+
+        public static Data<T, TX, TY> Coord_Flip<T, TX, TY>(this Data<T, TX, TY> data, 
+            (double min, double max)? limits = null, 
+            bool expand = true, 
+            bool clip = true)
+            where TX : struct
+            where TY : struct
+        {
+            data.Coord = new Flip(limits, expand, clip);
 
             return data;
         }

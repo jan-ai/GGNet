@@ -316,78 +316,70 @@
 
     <CascadingValue Value=@this>
         @{
-            var width = wrapper.Width - Data.Strip - (Data.N.cols - 1.0) * Theme.Panel.Spacing.X;
-
-            if (!Data.AxisVisibility.y)
-            {
-                width -= Data.Axis.width;
-            }
-
-            var height = wrapper.Height - Data.Strip - (Data.N.rows - 1.0) * Theme.Panel.Spacing.Y;
-
-            if (!Data.AxisVisibility.x)
-            {
-                height -= Data.Axis.height;
-            }
-
-            if (!Data.AxisTitlesVisibility.x && !string.IsNullOrEmpty(Data.XLab))
-            {
-                height -= Data.AxisTitles.x;
-            }
-
-            var xOffsetReset = wrapper.X;
-
-            var xOffset = xOffsetReset;
-            var yOffset = wrapper.Y;
+            var xAxisSpace = new double[Data.Coord.PanelRows(Data)];
+            var yAxisSpace = new double[Data.Coord.PanelColumns(Data)];
 
             for (var i = 0; i < Data.Panels.Count; i++)
             {
                 var panel = Data.Panels[i];
 
-                var x = xOffset;
-                var y = yOffset;
+                if (panel.xAxis.Show)
+                    xAxisSpace[panel.Position.row] = Math.Max(xAxisSpace[panel.Position.row], panel.xAxis.Height + Data.Theme.Axis.Text.Y.Margin.Top + Data.Theme.Axis.Text.Y.Margin.Bottom);
+
+                if (panel.yAxis.Show)
+                    yAxisSpace[panel.Position.col] = Math.Max(yAxisSpace[panel.Position.col], panel.yAxis.Width + Data.Theme.Axis.Text.Y.Margin.Left + Data.Theme.Axis.Text.Y.Margin.Right);
+            }
+
+            var width = wrapper.Width - Data.Strip - (Data.Coord.PanelColumns(Data) - 1.0) * Theme.Panel.Spacing.X - yAxisSpace.Sum();
+            var height = wrapper.Height - Data.Strip - (Data.Coord.PanelRows(Data) - 1.0) * Theme.Panel.Spacing.Y - xAxisSpace.Sum();
+
+            if (!Data.Panels[^1].xAxis.TitlesVisibility && !string.IsNullOrEmpty(Data.XLab))
+            {
+                height -= Data.Panels[^1].xAxis.TitlesSize;
+            }
+
+            for (var i = 0; i < Data.Panels.Count; i++)
+            {
+                var panel = Data.Panels[i];
+                var (row, col) = panel.Position;
 
                 var w = panel.Width * width;
                 var h = panel.Height * height;
 
-                if (panel.Coord.row == 0)
+                var x = wrapper.X;
+                var y = wrapper.Y;
+
+                if (row > 0 || col > 0)
+                {
+                    for (var j = 0; j < Data.Panels.Count; j++)
+                    {
+                        var _panel = Data.Panels[j];
+                        var (_row, _col) = _panel.Position;
+
+                        if (_col < col && _row == row)
+                            x += _panel.Width * width + yAxisSpace[_panel.Position.col] + Theme.Panel.Spacing.X;
+
+                        if (_row < row && _col == col)
+                            y += _panel.Height * height + xAxisSpace[_panel.Position.row] + Theme.Panel.Spacing.Y;
+                    }
+                }
+
+                if (row == 0)
                 {
                     h += Data.Strip;
                 }
 
-                if (panel.Coord.col == 0 && !Data.AxisVisibility.y && Theme.Axis.Y == Position.Left)
+                if (row == (Data.Coord.PanelRows(Data) - 1))
                 {
-                    w += Data.Axis.width;
-                }
-
-                if (panel.Coord.row == (Data.N.rows - 1))
-                {
-                    if (!Data.AxisVisibility.x)
+                    if (!panel.xAxis.TitlesVisibility && !string.IsNullOrEmpty(Data.XLab))
                     {
-                        h += Data.Axis.height;
-                    }
-
-                    if (!Data.AxisTitlesVisibility.x && !string.IsNullOrEmpty(Data.XLab))
-                    {
-                        h += Data.AxisTitles.x;
+                        h += panel.xAxis.TitlesSize;
                     }
                 }
 
-                if (panel.Coord.col == (Data.N.cols - 1))
+                if (col == (Data.Coord.PanelColumns(Data) - 1))
                 {
                     w += Data.Strip;
-
-                    if (!Data.AxisVisibility.y && Theme.Axis.Y == Position.Right)
-                    {
-                        w += Data.Axis.width;
-                    }
-
-                    xOffset = xOffsetReset;
-                    yOffset += h + Theme.Panel.Spacing.Y;
-                }
-                else
-                {
-                    xOffset += w + Theme.Panel.Spacing.X;
                 }
 
                 <Panel Data=@panel
@@ -395,6 +387,8 @@
                        Y=@y
                        Width=@w
                        Height=@h
+                       XAxisSpace=@xAxisSpace[panel.Position.row]
+                       YAxisSpace=@yAxisSpace[panel.Position.col]
                        First=@(i == 0)
                        Last=@(i == (Data.Panels.Count - 1))
                        T=T TX=TX TY=TY />

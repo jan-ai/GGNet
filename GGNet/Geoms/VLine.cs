@@ -56,7 +56,7 @@ namespace GGNet.Geoms
             Positions.X.Train(item);
         }
 
-        protected override void Shape(T item, bool flip)
+        protected override void Shape(T item)
         {
             var x = Positions.X.Map(item);
 

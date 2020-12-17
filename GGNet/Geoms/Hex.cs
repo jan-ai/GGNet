@@ -121,8 +121,8 @@ namespace GGNet.Geoms
                 onMouseOver = (item, x, y, _) =>
                 {
                     panel.Component.Tooltip.Show(
-                        x,
-                        y,
+                        Positions.X.Position.Coord(x),
+                        Positions.Y.Position.Coord(y),
                         0,
                         Selectors.Tooltip(item),
                         Aesthetics.Fill?.Map(item) ?? Aesthetic.Fill,
@@ -170,7 +170,7 @@ namespace GGNet.Geoms
             });
         }
 
-        protected override void Shape(T item, bool flip)
+        protected override void Shape(T item)
         {
             var fill = Aesthetic.Fill;
 

@@ -43,10 +43,10 @@ namespace GGNet.Facets
 
         public override void Clear() => buffer.Clear();
 
-        public override (Facet<T> facet, bool showX, bool showY)[] Facets(Theme theme)
+        public override Facet<T>[] Facets()
         {
             var n = buffer.Count;
-            var facets = new (Facet<T> facet, bool showX, bool showY)[n];
+            var facets = new Facet<T>[n];
 
             var r = 0;
             var c = 0;
@@ -55,20 +55,14 @@ namespace GGNet.Facets
             {
                 var xStrip = buffer[i].ToString();
 
-                var showY = theme.Axis.Y == Position.Left ? c == 0 : (c == (NColumns - 1) || i == (n - 1));
+                facets[i] = new Facet<T>(this, (r, c), xStrip);
 
                 if (r == (NRows - 1))
                 {
-                    facets[i] = (new Facet<T>(this, (r, c), xStrip), true, showY);
-
                     c++;
                 }
                 else
                 {
-                    var showX = i == (n - 1);
-
-                    facets[i] = (new Facet<T>(this, (r, c), xStrip), showX, showY);
-
                     if (++c == NColumns)
                     {
                         r++;

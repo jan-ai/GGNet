@@ -8,6 +8,7 @@ namespace GGNet
 {
     using Scales;
     using Facets;
+    using Coords;
 
     public partial class Data<T, TX, TY> : IData
         where TX : struct
@@ -84,7 +85,7 @@ namespace GGNet
 
         public Faceting<T> Faceting { get; set; }
 
-        public bool Flip { get; set; }
+        public ICoord Coord { get; set; } = new Cartesian();
 
         internal Theme Theme { get; set; }
 
@@ -101,14 +102,6 @@ namespace GGNet
         internal (int rows, int cols) N { get; set; }
 
         internal double Strip { get; set; }
-
-        internal (double width, double height) Axis { get; set; }
-
-        internal (bool x, bool y) AxisVisibility { get; set; }
-
-        internal (double x, double y) AxisTitles { get; set; }
-
-        internal (bool x, bool y) AxisTitlesVisibility { get; set; }
 
         private bool grid = true;
 
@@ -199,20 +192,16 @@ namespace GGNet
                             Positions.Y.Register(factory.Y());
                         }
 
-                        var panel = factory.Build((i, 0));
+                        var panel = factory.Build(Coord.PanelSize((i, 0)));
+
+                        Coord.SetAxisVisibility(panel, Theme, false, false);
 
                         if (i == (n - 1))
                         {
-                            panel.Axis = (true, true);
-
                             if (!string.IsNullOrEmpty(XLab))
                             {
                                 panel.XLab = (XLab.Height(Theme.Axis.Title.X.Size), XLab);
                             }
-                        }
-                        else
-                        {
-                            panel.Axis = (false, true);
                         }
 
                         panel.YLab = (ylab, factory.YLab);
@@ -227,9 +216,9 @@ namespace GGNet
                     Positions.X.Instance();
                     Positions.Y.Instance();
 
-                    var panel = DefaultFactory.Build((0, 0));
+                    var panel = DefaultFactory.Build(Coord.PanelSize((0, 0)));
 
-                    panel.Axis = (true, true);
+                    Coord.SetAxisVisibility(panel, Theme, false, false);
 
                     if (!string.IsNullOrEmpty(XLab))
                     {
@@ -277,12 +266,12 @@ namespace GGNet
 
             Faceting.Set();
 
-            var facets = Faceting.Facets(Theme);
+            var facets = Faceting.Facets();
 
             N = (Faceting.NRows, Faceting.NColumns);
-
-            var width = 1.0 / Faceting.NColumns;
-            var height = 1.0 / Faceting.NRows; ;
+            
+            var width = 1.0 / Coord.PanelColumns(this);
+            var height = 1.0 / Coord.PanelRows(this);
 
             if (Faceting.Strip)
             {
@@ -299,8 +288,6 @@ namespace GGNet
                 Positions.Y.Instance();
             }
 
-            AxisVisibility = (Faceting.FreeX, Faceting.FreeY);
-
             var xlab = 0.0;
             if (!string.IsNullOrEmpty(XLab))
             {
@@ -315,7 +302,7 @@ namespace GGNet
 
             for (var i = 0; i < facets.Length; i++)
             {
-                var (facet, showX, showY) = facets[i];
+                var facet = facets[i];
 
                 if (Faceting.FreeX)
                 {
@@ -327,15 +314,15 @@ namespace GGNet
                     Positions.Y.Instance();
                 }
 
-                var panel = DefaultFactory.Build(facet.Coord, facet, width, height);
+                var panel = DefaultFactory.Build(Coord.PanelSize(facet.Coord), facet, width, height);
 
                 panel.Strip = (facet.XStrip, facet.YStrip);
 
-                panel.Axis = (Faceting.FreeX || showX, Faceting.FreeY || showY);
+                Coord.SetAxisVisibility(panel, Theme, Faceting.FreeX, Faceting.FreeY);
 
-                if (xlab > 0.0 && facet.Coord.row == (Faceting.NRows - 1))
+                if (xlab > 0.0 && panel.Position.row == (Coord.PanelRows(this) - 1))
                 {
-                    if (facet.Coord.column == (Faceting.NColumns - 1))
+                    if (panel.Position.col == (Coord.PanelColumns(this) - 1))
                     {
                         panel.XLab = (xlab, XLab);
                     }
@@ -347,9 +334,9 @@ namespace GGNet
 
                 if (ylab > 0)
                 {
-                    if (Theme.Axis.Y == Position.Left && panel.Coord.col == 0)
+                    if (Theme.Axis.Y == Position.Left && panel.Position.col == 0)
                     {
-                        if (panel.Coord.row == 0)
+                        if (panel.Position.row == 0)
                         {
                             panel.YLab = (ylab, DefaultFactory.YLab);
                         }
@@ -358,9 +345,9 @@ namespace GGNet
                             panel.YLab = (ylab, null);
                         }
                     }
-                    else if (Theme.Axis.Y == Position.Right && panel.Coord.col == (Faceting.NColumns - 1))
+                    else if (Theme.Axis.Y == Position.Right && panel.Position.col == (N.cols - 1))
                     {
-                        if (panel.Coord.row == 0)
+                        if (panel.Position.row == 0)
                         {
                             panel.YLab = (ylab, DefaultFactory.YLab);
                         }
@@ -449,65 +436,30 @@ namespace GGNet
                         geom.Clear();
                     }
 
-                    geom.Shape(Flip);
+                    geom.Shape();
                 }
             }
-
-            var height = 0.0;
-            var xtitles = 0.0;
 
             for (var i = 0; i < Positions.X.Scales.Count; i++)
             {
                 var scale = Positions.X.Scales[i];
 
                 scale.Set(grid);
-
-                if (grid)
-                {
-                    foreach (var (_, label) in scale.Labels)
-                    {
-                        height = Max(height, label.Height(Theme.Axis.Text.X.Size));
-                    }
-
-                    foreach (var (_, title) in scale.Titles)
-                    {
-                        xtitles = Max(xtitles, title.Height(Theme.Axis.Title.X.Size));
-                    }
-                }
             }
-
-            var xtitlesVisibility = xtitles > 0.0;
-
-            xtitles = Max(xtitles, XLab.Height(Theme.Axis.Title.X.Size));
-
-            var width = 0.0;
-            var ytitles = 0.0;
 
             for (var i = 0; i < Positions.Y.Scales.Count; i++)
             {
                 var scale = Positions.Y.Scales[i];
 
                 scale.Set(grid);
-
-                if (grid)
-                {
-                    foreach (var (_, label) in scale.Labels)
-                    {
-                        width = Max(width, label.Width(Theme.Axis.Text.Y.Size));
-                    }
-
-                    foreach (var (_, title) in scale.Titles)
-                    {
-                        ytitles = Max(ytitles, title.Height(Theme.Axis.Title.Y.Size));
-                    }
-                }
             }
 
-            Axis = (width, height);
+            for (var p = 0; p < Panels.Count; p++)
+            {
+                var panel = Panels[p];
 
-            AxisTitles = (xtitles, ytitles);
-
-            AxisTitlesVisibility = (xtitlesVisibility, false);
+                panel.Render(first);
+            }
         }
 
         #region IData

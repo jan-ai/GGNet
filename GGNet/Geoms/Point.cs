@@ -121,8 +121,8 @@ namespace GGNet.Geoms
                     }
 
                     panel.Component.Tooltip.Show(
-                        x,
-                        y,
+                        Positions.X.Position.Coord(x),
+                        Positions.Y.Position.Coord(y),
                         radius,
                         Selectors.Tooltip(item),
                         Aesthetics.Color?.Map(item) ?? Aesthetic.Fill,
@@ -178,7 +178,7 @@ namespace GGNet.Geoms
             });
         }
 
-        protected override void Shape(T item, bool flip)
+        protected override void Shape(T item)
         {
             var color = Aesthetic.Fill;
 

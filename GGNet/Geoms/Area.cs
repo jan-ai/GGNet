@@ -116,8 +116,8 @@ namespace GGNet.Geoms
                 onMouseOver = (item, x, y, _) =>
                 {
                     panel.Component.Tooltip.Show(
-                        x,
-                        y,
+                        Positions.X.Position.Coord(x),
+                        Positions.Y.Position.Coord(y),
                         0,
                         Selectors.Tooltip(item),
                         Aesthetics.Fill?.Map(item) ?? Aesthetic.Fill,
@@ -163,7 +163,7 @@ namespace GGNet.Geoms
             });
         }
 
-        protected override void Shape(T item, bool flip)
+        protected override void Shape(T item)
         {
             var fill = Aesthetic.Fill;
             if (Aesthetics.Fill != null)
@@ -242,7 +242,7 @@ namespace GGNet.Geoms
 
         private static readonly SumComparer sumComparer = new SumComparer();
 
-        private void Stack(bool flip)
+        private void Stack ()
         {
             var sum = new SortedBuffer<(double x, double y)>(comparer: sumComparer);
             var circles = new Buffer<Shape>();
@@ -394,7 +394,7 @@ namespace GGNet.Geoms
             Layer.Add(circles);
         }
 
-        private void Identity(bool flip)
+        private void Identity ()
         {
             var circles = new Buffer<Shape>();
 
@@ -436,15 +436,15 @@ namespace GGNet.Geoms
             Layer.Add(circles);
         }
 
-        protected override void Set(bool flip)
+        protected override void Set()
         {
             if (position == PositionAdjustment.Stack)
             {
-                Stack(flip);
+                Stack();
             }
             else if (position == PositionAdjustment.Identity)
             {
-                Identity(flip);
+                Identity();
             }
             else
             {

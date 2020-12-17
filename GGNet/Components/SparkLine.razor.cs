@@ -5,7 +5,7 @@ using GGNet.Transformations;
 
 namespace GGNet.Components
 {
-    public partial class SparkLine<T, TX, TY> : PlotBase<T, TX, TY>, IPanel, ICoord
+    public partial class SparkLine<T, TX, TY> : PlotBase<T, TX, TY>, IPanel
         where TX : struct
         where TY : struct
     {
@@ -39,8 +39,6 @@ namespace GGNet.Components
             Data.Render(true);
 
             Panel = Data.Panels[0];
-            xscale = Panel.X;
-            yscale = Panel.Y;
 
             Panel.Register(this);
         }

@@ -26,7 +26,7 @@
           height=@Area.Height.ToString(CultureInfo.InvariantCulture)
           class="panel" />
 
-    <Area T=T TX=TX TY=TY Data=@Panel Coord=@this Zone=@Area Clip=@(Id + "-" + Panel.Id + "-area") RenderPolicy=@renderChildPolicy />
+    <Area T=T TX=TX TY=TY Data=@Panel Zone=@Area Clip=@(Id + "-" + Panel.Id + "-area") RenderPolicy=@renderChildPolicy />
 
-    <GGNet.Components.Tooltips.SparkLine Id=@Id Coord=@this Area=@Area Theme=@Theme @ref=@tooltip />
+    <GGNet.Components.Tooltips.SparkLine Id=@Id Coord=@Data.Coord Area=@Area Theme=@Theme @ref=@tooltip />
 </svg>

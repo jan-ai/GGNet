@@ -74,9 +74,9 @@
 
     if (Data.Data.Theme.Panel.Grid.Major.X.Width > 0)
     {
-        foreach (var b in xscale.Breaks)
+        foreach (var b in Data.xAxis.Breaks)
         {
-            var x = CoordX(b);
+            var x = Area.CoordX(b);
             <line x1=@x.ToString(CultureInfo.InvariantCulture)
                   x2=@x.ToString(CultureInfo.InvariantCulture) 
                   y1=@y1.ToString(CultureInfo.InvariantCulture)
@@ -88,9 +88,9 @@
 
     if (Data.Data.Theme.Panel.Grid.Minor.X.Width > 0)
     {
-        foreach (var b in xscale.MinorBreaks)
+        foreach (var b in Data.xAxis.MinorBreaks)
         {
-            var x = CoordX(b);
+            var x = Area.CoordX(b);
             <line x1=@x.ToString(CultureInfo.InvariantCulture)
                   x2=@x.ToString(CultureInfo.InvariantCulture) 
                   y1=@y1.ToString(CultureInfo.InvariantCulture)
@@ -100,35 +100,35 @@
         }
     }
 
-    if (Data.Axis.x)
+    if (Data.xAxis.Show)
     {
-        foreach (var (value, label) in xscale.Labels)
+        foreach (var (value, label) in Data.xAxis.Labels)
         {
-            var x = CoordX(value);
+            if (value < 0 || value > 1)
+                continue;
 
-            if (Area.X < x && x < (Area.X + Area.Width))
-            {
-                <g clip-path="url(#@(Plot.Id)-plot)">
-                    <text x=@x.ToString(CultureInfo.InvariantCulture)
-                          y=@xAxisText.Y.ToString(CultureInfo.InvariantCulture)
-                          class="axisTextX">@label</text>
-                </g>
-            }
+            var x = Area.CoordX(value);
+
+            <g clip-path="url(#@(Plot.Id)-plot)">
+                <text x=@x.ToString(CultureInfo.InvariantCulture)
+                      y=@xAxisText.Y.ToString(CultureInfo.InvariantCulture)
+                      class="axisTextX">@label</text>
+            </g>
         }
 
-        foreach (var (value, label) in xscale.Titles)
+        foreach (var (value, label) in Data.xAxis.Titles)
         {
-            var x = CoordX(value);
+            if (value < 0 || value > 1)
+                continue;
 
-            if (Area.X < x && x < (Area.X + Area.Width))
-            {
-                <g clip-path="url(#@(Plot.Id)-plot)">
-                    <text x=@x.ToString(CultureInfo.InvariantCulture)
-                          y=@xAxisSubText.Y.ToString(CultureInfo.InvariantCulture)
-                          class="axisTitleX" 
-                          text-anchor="middle">@label</text>
-                </g>
-            }
+            var x = Area.CoordX(value);
+
+            <g clip-path="url(#@(Plot.Id)-plot)">
+                <text x=@x.ToString(CultureInfo.InvariantCulture)
+                      y=@xAxisSubText.Y.ToString(CultureInfo.InvariantCulture)
+                      class="axisTitleX"
+                      text-anchor="middle">@label</text>
+            </g>
         }
     }
 }
@@ -140,9 +140,9 @@
 
     if (Data.Data.Theme.Panel.Grid.Major.Y.Width > 0)
     {
-        foreach (var b in yscale.Breaks)
+        foreach (var b in Data.yAxis.Breaks)
         {
-            var y = CoordY(b);
+            var y = Area.CoordY(b);
             <line x1=@x1.ToString(CultureInfo.InvariantCulture)
                   x2=@x2.ToString(CultureInfo.InvariantCulture)
                   y1=@y.ToString(CultureInfo.InvariantCulture)
@@ -154,9 +154,9 @@
 
     if (Data.Data.Theme.Panel.Grid.Minor.Y.Width > 0)
     {
-        foreach (var b in yscale.MinorBreaks)
+        foreach (var b in Data.yAxis.MinorBreaks)
         {
-            var y = CoordY(b);
+            var y = Area.CoordY(b);
             <line x1=@x1.ToString(CultureInfo.InvariantCulture)
                   x2=@x2.ToString(CultureInfo.InvariantCulture)
                   y1=@y.ToString(CultureInfo.InvariantCulture)
@@ -166,14 +166,14 @@
         }
     }
 
-    if (Data.Axis.y)
+    if (Data.yAxis.Show)
     {
         var height = Data.Data.Theme.Axis.Text.Y.Size.Height();
         var offset = height / 4.0;
 
-        foreach (var (value, label) in yscale.Labels)
+        foreach (var (value, label) in Data.yAxis.Labels)
         {
-            var y = CoordY(value) + offset;
+            var y = Area.CoordY(value) + offset;
 
             if (Area.Y < (y - height / 2.0) && (y + offset) < (Area.Y + Area.Height))
             {
@@ -187,7 +187,7 @@
     }
 }
 
-<Area T=T TX=TX TY=TY Data=@Data Coord=@this Zone=@Area Clip=@(clip + "-area") RenderPolicy=@areaPolicy/>
+<Area T=T TX=TX TY=TY Data=@Data Zone=@Area Clip=@(clip + "-area") RenderPolicy=@areaPolicy/>
 
 @if (!string.IsNullOrEmpty(Data.XLab.text))
 {
@@ -214,4 +214,4 @@
     </g>
 }
 
-<GGNet.Components.Tooltips.Plot Id=@Plot.Id Coord=@this Area=@Area Theme=@Plot.Theme @ref=@tooltip />
+<GGNet.Components.Tooltips.Plot Id=@Plot.Id Coord=@Data.Data.Coord Area=@Area Theme=@Plot.Theme @ref=@tooltip />

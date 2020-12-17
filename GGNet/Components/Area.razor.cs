@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
-
+using GGNet.Transformations;
 using Microsoft.AspNetCore.Components;
 
 namespace GGNet.Components
@@ -16,9 +16,6 @@ namespace GGNet.Components
         public RenderChildPolicyBase RenderPolicy { get; set; }
 
         [Parameter]
-        public ICoord Coord { get; set; }
-
-        [Parameter]
         public Zone Zone { get; set; }
 
         [Parameter]
@@ -27,6 +24,11 @@ namespace GGNet.Components
         private readonly StringBuilder sb = new StringBuilder();
 
         protected override bool ShouldRender() => RenderPolicy.ShouldRender();
+
+        public (double min, double max) XRange => Data.Data.Coord.XRange(Data); 
+        public ITransformation<double> XTransformation => Data.Data.Coord.XTransformation(Data);
+        public (double min, double max) YRange => Data.Data.Coord.YRange(Data);
+        public ITransformation<double> YTransformation => Data.Data.Coord.YTransformation(Data);
 
         private string Path(Shapes.Path path)
         {
@@ -41,9 +43,9 @@ namespace GGNet.Components
                     continue;
 
                 sb.Append(op);
-                sb.Append(Coord.CoordX(x).ToString(CultureInfo.InvariantCulture));
+                sb.Append(Zone.CoordX(x).ToString(CultureInfo.InvariantCulture));
                 sb.Append(" ");
-                sb.Append(Coord.CoordY(y).ToString(CultureInfo.InvariantCulture));
+                sb.Append(Zone.CoordY(y).ToString(CultureInfo.InvariantCulture));
                 op = " L ";
             }
 
@@ -59,9 +61,9 @@ namespace GGNet.Components
                 var (x, _, ymax) = area.Points[j];
 
                 sb.Append(j == 0 ? "M " : " L ");
-                sb.Append(Coord.CoordX(x).ToString(CultureInfo.InvariantCulture));
+                sb.Append(Zone.CoordX(x).ToString(CultureInfo.InvariantCulture));
                 sb.Append(" ");
-                sb.Append(Coord.CoordY(ymax).ToString(CultureInfo.InvariantCulture));
+                sb.Append(Zone.CoordY(ymax).ToString(CultureInfo.InvariantCulture));
             }
 
             for (var j = 0; j < area.Points.Count; j++)
@@ -69,9 +71,9 @@ namespace GGNet.Components
                 var (x, ymin, _) = area.Points[area.Points.Count - j - 1];
 
                 sb.Append(" L ");
-                sb.Append(Coord.CoordX(x).ToString(CultureInfo.InvariantCulture));
+                sb.Append(Zone.CoordX(x).ToString(CultureInfo.InvariantCulture));
                 sb.Append(" ");
-                sb.Append(Coord.CoordY(ymin).ToString(CultureInfo.InvariantCulture));
+                sb.Append(Zone.CoordY(ymin).ToString(CultureInfo.InvariantCulture));
             }
 
             sb.Append(" Z");
@@ -84,9 +86,9 @@ namespace GGNet.Components
             for (var j = 0; j < poly.Longitude.Length; j++)
             {
                 sb.Append(j == 0 ? "M " : " L ");
-                sb.Append(Coord.CoordX(poly.Longitude[j]).ToString(CultureInfo.InvariantCulture));
+                sb.Append(Zone.CoordX(poly.Longitude[j]).ToString(CultureInfo.InvariantCulture));
                 sb.Append(" ");
-                sb.Append(Coord.CoordY(poly.Latitude[j]).ToString(CultureInfo.InvariantCulture));
+                sb.Append(Zone.CoordY(poly.Latitude[j]).ToString(CultureInfo.InvariantCulture));
             }
 
             sb.Append(" Z");

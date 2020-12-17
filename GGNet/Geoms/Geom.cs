@@ -15,7 +15,7 @@ namespace GGNet.Geoms
 
         void Legend();
 
-        void Shape(bool flip);
+        void Shape();
 
         void Clear();
     }
@@ -196,13 +196,13 @@ namespace GGNet.Geoms
         {
         }
 
-        protected abstract void Shape(T item, bool flip);
+        protected abstract void Shape(T item);
 
-        protected virtual void Set(bool flip)
+        protected virtual void Set()
         {
         }
 
-        public void Shape(bool flip)
+        public void Shape()
         {
             for (int i = 0; i < source.Count; i++)
             {
@@ -213,10 +213,10 @@ namespace GGNet.Geoms
                     continue;
                 }
 
-                Shape(item, flip);
+                Shape(item);
             }
 
-            Set(flip);
+            Set();
         }
 
         public virtual void Clear() => Layer?.Clear();

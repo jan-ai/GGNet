@@ -143,8 +143,8 @@ namespace GGNet.Geoms
                     }
 
                     panel.Component.Tooltip.Show(
-                        x,
-                        y,
+                        Positions.X.Position.Coord(x),
+                        Positions.Y.Position.Coord(y),
                         radius,
                         Selectors.Tooltip(item),
                         Aesthetics.Color?.Map(item) ?? Circle.Fill,
@@ -204,7 +204,7 @@ namespace GGNet.Geoms
             });
         }
 
-        protected override void Shape(T item, bool flip)
+        protected override void Shape(T item)
         {
             var color = Line.Fill;
 
@@ -243,7 +243,7 @@ namespace GGNet.Geoms
             }
         }
 
-        private void Identity(bool flip)
+        private void Identity()
         {
             for (var i = 0; i < bars.Count; i++)
             {
@@ -312,7 +312,7 @@ namespace GGNet.Geoms
             }
         }
 
-        private void Dodge(bool flip)
+        private void Dodge()
         {
 
             var delta = 0.6;
@@ -403,15 +403,15 @@ namespace GGNet.Geoms
             }
         }
 
-        protected override void Set(bool flip)
+        protected override void Set()
         {
             if (position == PositionAdjustment.Identity)
             {
-                Identity(flip);
+                Identity();
             }
             else if (position == PositionAdjustment.Dodge)
             {
-                Dodge(flip);
+                Dodge();
             }
             else
             {
