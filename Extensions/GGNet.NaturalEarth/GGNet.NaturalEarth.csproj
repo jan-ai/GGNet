@@ -18,8 +18,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GGNet" Version="1.4.1" />
-    <PackageReference Include="MessagePack" Version="2.1.115" />
+    <PackageReference Include="MessagePack" Version="2.1.152" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\GGNet\GGNet.csproj" />
   </ItemGroup>
 
 </Project>
