@@ -200,11 +200,15 @@ namespace GGNet
                         {
                             if (!string.IsNullOrEmpty(XLab))
                             {
-                                panel.XLab = (XLab.Height(Theme.Axis.Title.X.Size), XLab);
+                                var xAxis = Coord.XAxis(panel);
+                                xAxis.AxisLabel = XLab;
+                                xAxis.AxisLabelSize = XLab.Height(Theme.Axis.Title.X.Size);
                             }
                         }
 
-                        panel.YLab = (ylab, factory.YLab);
+                        var yAxis = Coord.YAxis(panel);
+                        yAxis.AxisLabel = factory.YLab;
+                        yAxis.AxisLabelSize = ylab;
 
                         Panels.Add(panel);
                     }
@@ -222,12 +226,16 @@ namespace GGNet
 
                     if (!string.IsNullOrEmpty(XLab))
                     {
-                        panel.XLab = (XLab.Height(Theme.Axis.Title.X.Size), XLab);
+                        var xAxis = Coord.XAxis(panel);
+                        xAxis.AxisLabel = XLab;
+                        xAxis.AxisLabelSize =XLab.Height(Theme.Axis.Title.X.Size);
                     }
 
                     if (!string.IsNullOrEmpty(DefaultFactory.YLab))
                     {
-                        panel.YLab = (DefaultFactory.YLab.Height(Theme.Axis.Title.Y.Size), DefaultFactory.YLab);
+                        var yAxis = Coord.YAxis(panel);
+                        yAxis.AxisLabel = DefaultFactory.YLab;
+                        yAxis.AxisLabelSize = DefaultFactory.YLab.Height(Theme.Axis.Title.Y.Size);
                     }
 
                     Panels.Add(panel);
@@ -316,45 +324,26 @@ namespace GGNet
 
                 var panel = DefaultFactory.Build(Coord.PanelSize(facet.Coord), facet, width, height);
 
-                panel.Strip = (facet.XStrip, facet.YStrip);
+                panel.XStrip.Label = facet.XStrip;
+                panel.YStrip.Label = facet.YStrip;
 
                 Coord.SetAxisVisibility(panel, Theme, Faceting.FreeX, Faceting.FreeY);
 
                 if (xlab > 0.0 && panel.Position.row == (Coord.PanelRows(this) - 1))
                 {
-                    if (panel.Position.col == (Coord.PanelColumns(this) - 1))
-                    {
-                        panel.XLab = (xlab, XLab);
-                    }
-                    else
-                    {
-                        panel.XLab = (xlab, null);
-                    }
+                    var xAxis = Coord.XAxis(panel);
+                    xAxis.AxisLabel = (panel.Position.col == (Coord.PanelColumns(this) - 1)) ? XLab : null;
+                    xAxis.AxisLabelSize = xlab;
                 }
 
                 if (ylab > 0)
                 {
-                    if (Theme.Axis.Y == Position.Left && panel.Position.col == 0)
+                    if ((Theme.Axis.Y == Position.Left && panel.Position.col == 0) 
+                        || Theme.Axis.Y == Position.Right && panel.Position.col == (N.cols - 1))
                     {
-                        if (panel.Position.row == 0)
-                        {
-                            panel.YLab = (ylab, DefaultFactory.YLab);
-                        }
-                        else
-                        {
-                            panel.YLab = (ylab, null);
-                        }
-                    }
-                    else if (Theme.Axis.Y == Position.Right && panel.Position.col == (N.cols - 1))
-                    {
-                        if (panel.Position.row == 0)
-                        {
-                            panel.YLab = (ylab, DefaultFactory.YLab);
-                        }
-                        else
-                        {
-                            panel.YLab = (ylab, null);
-                        }
+                        var yAxis = Coord.YAxis(panel);
+                        yAxis.AxisLabel = (panel.Position.row == 0) ? DefaultFactory.YLab : null;
+                        yAxis.AxisLabelSize = ylab;
                     }
                 }
 
@@ -457,6 +446,15 @@ namespace GGNet
             for (var p = 0; p < Panels.Count; p++)
             {
                 var panel = Panels[p];
+
+                for (var g = 0; g < panel.Geoms.Count; g++)
+                {
+                    var geom = panel.Geoms[g];
+
+                    for (var s = 0; s < geom.Layer.Count; s++)
+                        geom.Layer[s].Scale(panel.X, panel.Y);
+
+                }
 
                 panel.Render(first);
             }

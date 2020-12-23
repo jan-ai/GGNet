@@ -32,29 +32,19 @@ namespace GGNet.Scales
 
         protected void SetRange(double min, double max)
         {
-            if (min == max)
+            if (max < min)
             {
-                Range = (
-                    min - 0.05,
-                    max + 0.05
-                );
+                var tmp = min;
+                min = max;
+                max = tmp;
             }
-            else
-            {
-                if (max < min)
-                {
-                    var tmp = min;
-                    min = max;
-                    max = tmp;
-                }
 
-                var range = max - min;
+            var range = max - min;
 
-                Range = (
-                    min - (expand.minMult * range + expand.minAdd),
-                    max + expand.maxMult * range + expand.maxAdd
-                );
-            }
+            Range = (
+                min - (expand.minMult * range + expand.minAdd),
+                max + expand.maxMult * range + expand.maxAdd
+            );
         }
 
         protected double? _min = null;

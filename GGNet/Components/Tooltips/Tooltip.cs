@@ -5,6 +5,9 @@ namespace GGNet.Components.Tooltips
 {
     public abstract class Tooltip: ComponentBase, ITooltip
     {
+        [CascadingParameter]
+        public Theme Theme { get; set; }
+
         [Parameter]
         public string Id{ get; set; }
 
@@ -13,9 +16,6 @@ namespace GGNet.Components.Tooltips
 
         [Parameter]
         public Zone Area{ get; set; }
-
-        [Parameter]
-        public Theme Theme{ get; set; }
 
         protected bool visibility = false;
 

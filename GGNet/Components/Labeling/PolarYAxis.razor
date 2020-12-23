@@ -1,0 +1,32 @@
+﻿@using System.Globalization
+
+@{ 
+    var cx = Area.X + Area.Width / 2;
+    var cy = Area.Y + Area.Height / 2;
+    var radius = Math.Min(Area.Width / 2, Area.Height / 2);
+
+    <g clip-path="url(#@ClipId)">
+        <circle cx=@cx.ToString(CultureInfo.InvariantCulture)
+                cy=@cy.ToString(CultureInfo.InvariantCulture)
+                r=@radius.ToString(CultureInfo.InvariantCulture)
+                fill="none"
+                class="gridMajorY" />
+    </g>
+
+    var height = Theme.Axis.Text.Y.Size.Height();
+    var offset = height / 4.0;
+
+    foreach (var (value, label) in Axis.Labels)
+    {
+        var (x, y) = Coord.Transform(Area, 1, value);
+
+        if (Area.Y < (y - height / 2.0) && (y + offset) < (Area.Y + Area.Height))
+        {
+            <g clip-path="url(#@ClipId)">
+                <text x=@x.ToString(CultureInfo.InvariantCulture)
+                      y=@y.ToString(CultureInfo.InvariantCulture)
+                      class="axisTextY">@label</text>
+            </g>
+        }
+    }
+}

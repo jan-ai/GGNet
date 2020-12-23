@@ -10,10 +10,18 @@ namespace GGNet.Shapes
 
         public override void Scale<TX, TY>(Position<TX> ScaleX, Position<TY> ScaleY)
         {
-            for (var i = 0; i < Path.Longitude.Length; i++)
+            var oldPath = Path;
+            Path = new Geospacial.Polygon()
             {
-                Path.Longitude[i] = ScaleX.Coord(Path.Longitude[i]);
-                Path.Latitude[i] = ScaleY.Coord(Path.Latitude[i]);
+                Hole = oldPath.Hole,
+                Latitude = new double[oldPath.Latitude.Length],
+                Longitude = new double[oldPath.Longitude.Length]
+            };
+
+            for (var i = 0; i < oldPath.Longitude.Length; i++)
+            {
+                Path.Longitude[i] = ScaleX.Coord(oldPath.Longitude[i]);
+                Path.Latitude[i] = ScaleY.Coord(oldPath.Latitude[i]);
             }
         }
     }

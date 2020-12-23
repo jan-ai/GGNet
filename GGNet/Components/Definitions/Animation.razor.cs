@@ -4,11 +4,11 @@ namespace GGNet.Components.Definitions
 {
     public partial class Animation : ComponentBase
     {
-        [Parameter]
-        public string Id { get; set; }
+        [CascadingParameter]
+        public Theme Theme { get; set; }
 
         [Parameter]
-        public Theme Theme { get; set; }
+        public string Id { get; set; }
 
         protected override bool ShouldRender() => false;
     }

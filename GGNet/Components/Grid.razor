@@ -1,0 +1,70 @@
+﻿@using System.Globalization
+    
+@if (Theme.Panel.Grid.Major.X.Width > 0)
+{
+    foreach (var b in XAxis.Breaks)
+    {
+        if (0 > b || b > 1)
+            continue;
+
+        var (x1, y1, x2, y2) = Coord.XGrid(Zone, b);
+        <line x1=@x1.ToString(CultureInfo.InvariantCulture)
+                x2=@x2.ToString(CultureInfo.InvariantCulture) 
+                y1=@y1.ToString(CultureInfo.InvariantCulture)
+                y2=@y2.ToString(CultureInfo.InvariantCulture)
+                class="gridMajorX" 
+                clip-path="url(#@ClipId)" />
+    }
+}
+
+@if (Theme.Panel.Grid.Minor.X.Width > 0)
+{
+    foreach (var b in XAxis.MinorBreaks)
+    {
+        if (0 > b || b > 1)
+            continue;
+
+        var (x1, y1, x2, y2) = Coord.XGrid(Zone, b);
+        <line x1=@x1.ToString(CultureInfo.InvariantCulture)
+                x2=@x2.ToString(CultureInfo.InvariantCulture) 
+                y1=@y1.ToString(CultureInfo.InvariantCulture)
+                y2=@y2.ToString(CultureInfo.InvariantCulture)
+                class="gridMinorX" 
+                clip-path="url(#@ClipId)" />
+    }
+}
+
+@if (Theme.Panel.Grid.Major.Y.Width > 0)
+{
+    foreach (var b in YAxis.Breaks)
+    {
+        if (0 > b || b > 1)
+            continue;
+
+        var (x1, y1, x2, y2) = Coord.YGrid(Zone, b);
+        <line x1=@x1.ToString(CultureInfo.InvariantCulture)
+                x2=@x2.ToString(CultureInfo.InvariantCulture)
+                y1=@y1.ToString(CultureInfo.InvariantCulture)
+                y2=@y2.ToString(CultureInfo.InvariantCulture)
+                class="gridMajorY" 
+                clip-path="url(#@ClipId)" />
+    }
+}
+
+@if (Theme.Panel.Grid.Minor.Y.Width > 0)
+{
+    foreach (var b in YAxis.MinorBreaks)
+    {
+        if (0 > b || b > 1)
+            continue;
+
+        var (x1, y1, x2, y2) = Coord.YGrid(Zone, b);
+        <line x1=@x1.ToString(CultureInfo.InvariantCulture)
+                x2=@x2.ToString(CultureInfo.InvariantCulture)
+                y1=@y1.ToString(CultureInfo.InvariantCulture)
+                y2=@y2.ToString(CultureInfo.InvariantCulture)
+                class="gridMinorY" 
+                clip-path="url(#@ClipId)" />
+    }
+}
+

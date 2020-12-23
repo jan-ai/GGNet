@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Text;
 using GGNet.Transformations;
 using Microsoft.AspNetCore.Components;
@@ -113,6 +114,45 @@ namespace GGNet.Components
                     sb.Append(" ");
 
                 AppendPolygon(polygons[i]);
+            }
+
+            return sb.ToString();
+        }
+
+        private string Path(Shapes.Polycurve curve)
+        {
+            sb.Clear();
+
+            for (var j = 0; j < curve.Points.Count; j++)
+            {
+                var arc = curve.Points[j];
+
+                if (double.IsNaN(arc.Y))
+                    continue;
+
+                var x = Zone.CoordX(arc.X);
+                var y = Zone.CoordY(arc.Y);
+
+                if (double.IsNaN(arc.Radius))
+                {
+                    sb.Append(j == 0 ? "M " : " L ");
+                }
+                else
+                {
+                    var radius = Zone.Width * arc.Radius;
+
+                    sb.Append(" A ");
+                    sb.Append(radius.ToString(CultureInfo.InvariantCulture));
+                    sb.Append(" ");
+                    sb.Append(radius.ToString(CultureInfo.InvariantCulture));
+                    sb.Append(" 0 ");
+                    sb.Append(arc.LargeArcFlag ? " 1 " : " 0 ");
+                    sb.Append(arc.SweepFlag ? " 1 " : " 0 ");
+                }
+
+                sb.Append(x.ToString(CultureInfo.InvariantCulture));
+                sb.Append(" ");
+                sb.Append(y.ToString(CultureInfo.InvariantCulture));
             }
 
             return sb.ToString();

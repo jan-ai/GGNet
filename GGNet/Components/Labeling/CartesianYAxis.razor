@@ -1,0 +1,28 @@
+﻿@using System.Globalization
+
+@{ 
+    var height = Theme.Axis.Text.Y.Size.Height();
+    var offset = height / 4.0;
+
+    foreach (var (value, label) in Axis.Labels)
+    {
+        var y = Area.CoordY(value) + offset;
+
+        if (Area.Y < (y - height / 2.0) && (y + offset) < (Area.Y + Area.Height))
+        {
+            <g clip-path="url(#@ClipId)">
+                <text x=@zone.X.ToString(CultureInfo.InvariantCulture)
+                      y=@y.ToString(CultureInfo.InvariantCulture)
+                      class="axisTextY">@label</text>
+            </g>
+        }
+    }
+
+    if (!string.IsNullOrEmpty(Axis.AxisLabel))
+    {
+        <g clip-path="url(#@ClipId)">
+            <text style="transform: translate(@(zoneTitle.X.ToString (CultureInfo.InvariantCulture))px, @(zoneTitle.Y.ToString (CultureInfo.InvariantCulture))px) rotate(@(Theme.Axis.Title.Y.Angle.ToString (CultureInfo.InvariantCulture))deg);" 
+                  class="axisTitleY">@Axis.AxisLabel</text>
+        </g>
+    }
+}

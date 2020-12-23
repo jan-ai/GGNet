@@ -19,8 +19,6 @@ namespace GGNet.Components
 
         private Zone Area;
         private Data<T, TX, TY>.Panel Panel;
-        private Position<TX> xscale;
-        private Position<TY> yscale;
 
         protected Tooltips.SparkLine tooltip;
         public ITooltip Tooltip => tooltip;
@@ -48,17 +46,5 @@ namespace GGNet.Components
             Data.Render(false);
             renderChildPolicy.Refresh();
         }
-
-        public double CoordX(double value) => Area.X + xscale.Coord(value) * Area.Width;
-
-        public (double min, double max) XRange => xscale.Range;
-
-        public ITransformation<double> XTransformation => xscale.RangeTransformation;
-
-        public double CoordY(double value) => Area.Y + (1 - yscale.Coord(value)) * Area.Height;
-
-        public (double min, double max) YRange => yscale.Range;
-
-        public ITransformation<double> YTransformation => yscale.RangeTransformation;
     }
 }

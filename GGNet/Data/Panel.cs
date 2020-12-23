@@ -6,7 +6,6 @@ namespace GGNet
     using Scales;
     using Facets;
     using Geoms;
-    using GGNet.Coords;
     using GGNet.Data;
     using System.Linq;
 
@@ -36,11 +35,8 @@ namespace GGNet
 
             public Buffer<IGeom> Geoms { get; } = new Buffer<IGeom>(8, 1);
 
-            internal (string x, string y) Strip { get; set; }
-
-            internal (double height, string text) XLab { get; set; }
-
-            internal (double width, string text) YLab { get; set; }
+            public Strip XStrip { get; set; } = new Strip(GGNet.Data.Strip.TextAlignment.BottomLeft);
+            public Strip YStrip { get; set; } = new Strip(GGNet.Data.Strip.TextAlignment.TopRight);
 
             internal Components.IPanel Component { get; set; }
 
@@ -117,8 +113,6 @@ namespace GGNet
                         xAxis.TitlesSize = Math.Max(xAxis.TitlesSize, title.Height(Data.Theme.Axis.Title.X.Size));
                 }
 
-                xAxis.TitlesSize = Math.Max(xAxis.TitlesSize, Data.XLab.Height(Data.Theme.Axis.Title.X.Size));
-
                 yAxis.Width = 0.0;
                 yAxis.TitlesSize = 0.0;
 
@@ -129,16 +123,6 @@ namespace GGNet
 
                     foreach (var (_, title) in yAxis.Titles)
                         yAxis.TitlesSize = Math.Max(yAxis.TitlesSize, title.Height(Data.Theme.Axis.Title.Y.Size));
-                }
-
-                for (var g = 0; g < Geoms.Count; g++)
-                {
-                    var geom = Geoms[g];
-
-                    for (var s = 0; s < geom.Layer.Count; s++)
-                    {
-                        geom.Layer[s].Scale(X, Y);
-                    }
                 }
             }
         }

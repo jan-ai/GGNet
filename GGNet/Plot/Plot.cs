@@ -480,6 +480,18 @@ namespace GGNet
             return data;
         }
 
+        public static Data<T, TX, TY> Coord_Polar<T, TX, TY>(this Data<T, TX, TY> data,
+            Polar.AngelMapping theta = Polar.AngelMapping.X, 
+            double startRadians = 0, 
+            Polar.Direction direction = Polar.Direction.Clockwise)
+            where TX : struct
+            where TY : struct
+        {
+            data.Coord = new Polar(theta, startRadians, direction);
+
+            return data;
+        }
+
         internal static Data<T1, TX1, TY1>.PanelFactory Add_Geom<T1, TX1, TY1, T2, TX2, TY2>(this Data<T1, TX1, TY1>.PanelFactory panel, Func<Geom<T2, TX2, TY2>> builder)
             where TX1 : struct
             where TY1 : struct

@@ -1,10 +1,13 @@
 ﻿@using System.Globalization
+@using GGNet.Shapes
 
 @typeparam T
 @typeparam TX
 @typeparam TY
 
-@using GGNet.Shapes
+<GGNet.Components.Definitions.Area Id=@Clip Zone=@Zone />
+
+<GGNet.Components.Grid ClipId=@Clip Zone=@Zone Coord=@Data.Data.Coord XAxis=@Data.xAxis YAxis=@Data.yAxis /> 
 
 @for (var g = 0; g < Data.Geoms.Count; g++)
 {
@@ -12,7 +15,7 @@
 
     for (var i = 0; i < geom.Layer.Count; i++)
     {
-        var shape = Data.Data.Coord.Transform(geom.Layer[i]);
+        var shape = Data.Data.Coord.Transform(Zone, geom.Layer[i]);
 
         if (shape is Shapes.Line l)
         {
@@ -130,6 +133,19 @@
                   @onmouseover=@(async e => await multi.OnMouseOverHandler(e))
                   @onmouseout=@(async e => await multi.OnMouseOutHandler(e)) />
         }
+        else if (shape is Shapes.Polycurve curve)
+        {
+            <path d=@Path(curve)
+                  class=@curve.Css()
+                  fill=@curve.Aesthetic.Fill
+                  fill-opacity=@curve.Aesthetic.Alpha.ToString(CultureInfo.InvariantCulture)
+                  stroke=@curve.Aesthetic.Color
+                  stroke-width=@curve.Aesthetic.Width.ToString(CultureInfo.InvariantCulture)
+                  clip-path="url(#@(Clip))"
+                  @onclick=@(async e => await curve.OnClickHandler(e))
+                  @onmouseover=@(async e => await curve.OnMouseOverHandler(e))
+                  @onmouseout=@(async e => await curve.OnMouseOutHandler(e)) />
+        }
         else if (shape is Shapes.Text text)
         {
             <g style="pointer-events: none;" clip-path="url(#@(Clip))">
@@ -141,8 +157,8 @@
         else if (shape is Shapes.VLine vline)
         {
             var x = Zone.CoordX(vline.X);
-            var y1 = Zone.CoordY(Zone.Y);
-            var y2 = Zone.CoordY(Zone.Y + Zone.Height);
+            var y1 = Zone.Y;
+            var y2 = Zone.Y + Zone.Height;
 
             <line x1=@x.ToString(CultureInfo.InvariantCulture)
                   y1=@y1.ToString(CultureInfo.InvariantCulture)
@@ -183,9 +199,9 @@
         }
         else if (shape is Shapes.HLine hline)
         {
-            var x1 = Zone.CoordX(Zone.X);
+            var x1 = Zone.X;
             var y = Zone.CoordY(hline.Y);
-            var x2 = Zone.CoordX(Zone.X + Zone.Width);
+            var x2 = Zone.X + Zone.Width;
 
             <line x1=@x1.ToString(CultureInfo.InvariantCulture)
                   y1=@y.ToString(CultureInfo.InvariantCulture)
@@ -240,10 +256,10 @@
                 ymax = YTransformation.Apply(ymax);
             }
 
-            var x1 = Zone.CoordX(Zone.X);
-            var y1 = Zone.CoordY(ymin);
-            var x2 = Zone.CoordX(Zone.X + Zone.Width);
-            var y2 = Zone.CoordY(ymax);
+            var x1 = Zone.X;
+            var y1 = Zone.CoordY(Data.Y.Coord(ymin));
+            var x2 = Zone.X + Zone.Width;
+            var y2 = Zone.CoordY(Data.Y.Coord(ymax));
 
             <line x1=@x1.ToString(CultureInfo.InvariantCulture)
                   y1=@y1.ToString(CultureInfo.InvariantCulture)
@@ -288,7 +304,7 @@
 
                             }
 
-                            x = Zone.CoordX(x);
+                            x = Zone.CoordX(Data.X.Coord(x));
 
                             y = Zone.Y;
                         }
@@ -312,7 +328,7 @@
 
                             }
 
-                            x = Zone.CoordX(x);
+                            x = Zone.CoordX(Data.X.Coord(x));
 
                             y = Zone.Y + Zone.Height;
                         }
@@ -345,7 +361,7 @@
 
                             }
 
-                            x = Zone.CoordX(x);
+                            x = Zone.CoordX(Data.X.Coord(x));
 
                             y = Zone.Y + Zone.Height;
                         }
@@ -369,7 +385,7 @@
 
                             }
 
-                            x = Zone.CoordX(x);
+                            x = Zone.CoordX(Data.X.Coord(x));
 
                             y = Zone.Y;
                         }

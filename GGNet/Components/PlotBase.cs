@@ -174,7 +174,7 @@ namespace GGNet.Components
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                 }
             }, TaskCreationOptions.LongRunning);

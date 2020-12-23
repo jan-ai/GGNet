@@ -6,6 +6,14 @@
 @using GGNet.NaturalEarth
 @using GGNet.Components
 
+<div class="border rounded-lg m-5 p-1" style="width: 720px;">
+    <Plot Data=@pie T=Beatles.Point TX=Double TY=Double />
+</div>
+
+<div class="border rounded-lg m-5 p-1" style="width: 720px;">
+    <Plot Data=@donut T=Beatles.Point TX=Double TY=Double />
+</div>
+
 <div class="border rounded-lg m-5 p-1" style="width: 720px; height: 670px;">
     <Plot Data=@map T=Point TX=Double TY=Double Width=720 Height=670 />
 </div>
@@ -34,8 +42,7 @@
     <Plot Data=@weapon T=Weapon.Point TX=Double TY=Double />
 </div>
 
-<div class="border rounded-lg m-5 p-1" style="        width: 720px;
-        background-color: #263238;">
+<div class="border rounded-lg m-5 p-1" style="width: 720px; background-color: #263238;">
     <Plot Data=@log10 T=Point2 TX=Double TY=Double />
 </div>
 
@@ -71,6 +78,8 @@
 
     Data<Beatles.Point, double, double> area;
     Data<Beatles.Point, double, double> stack;
+    Data<Beatles.Point, double, double> donut;
+    Data<Beatles.Point, double, double> pie;
 
     protected override void OnInitialized()
     {
@@ -207,7 +216,53 @@
                  .YLab("#")
                  .XLab("Year")
                  .Theme(theme);
+
+            donut = Plot.New(source, x: X, y: o => o.N)
+                 .Geom_Bar(tooltip: o => $"<b>{o.Name}:</b> {o.N}", position: PositionAdjustment.Stack, width: 0.7, alpha: 0.7)
+                 .Scale_X_Discrete(expand: (0.0, 0.1, 0, 0.1), formatter: labeller)
+                 .Scale_Y_Continuous(expand: (0.0, 0.0, 0.0, 0.0))
+                 .Scale_Fill_Discrete(o => o.Name, Colors.Brewer.YlGnBu[4], direction: -1)
+                 .Coord_Polar(theta: GGNet.Coords.Polar.AngelMapping.Y)
+                 .YLab("#")
+                 .XLab("Year")
+                 .Theme(theme);
         }
+
+        {
+            var source = new Source<Beatles.Point>(Beatles.Load()
+                           .Where(o => o.Year == 1930)
+                           .OrderBy(o => o.Year)
+                           .ThenBy(o => o.Name));
+
+            double X(Beatles.Point p) => p.Year switch
+            {
+                1930 => 1.0,
+                _ => throw new ArgumentException()
+            };
+
+            var labeller = new Labeller<double>
+            {
+                [1.0] = "1930",
+            };
+
+            var theme = Theme.Default(dark: false);
+            theme.Panel.Grid.Major.X.Width = 0;
+            theme.Panel.Grid.Major.Y.Fill = "rgba(0, 0, 0, 0.5)";
+            theme.Panel.Grid.Major.Y.LineType = LineType.Dotted;
+            theme.Panel.Grid.Minor.Y.Fill = "rgba(0, 0, 0, 0.5)";
+            theme.Panel.Grid.Minor.Y.LineType = LineType.Dotted;
+
+            pie = Plot.New(source, x: X, y: o => o.N)
+                 .Geom_Bar(tooltip: o => $"<b>{o.Name}:</b> {o.N}", position: PositionAdjustment.Stack, width: 0.5, alpha: 0.7)
+                 .Scale_X_Discrete(expand: (0.0, 0.0, 0.0, 0.0), formatter: labeller)
+                 .Scale_Y_Continuous(expand: (0.0, 0.0, 0.0, 0.0))
+                 .Scale_Fill_Discrete(o => o.Name, Colors.Brewer.YlGnBu[4], direction: -1)
+                 .Coord_Polar(theta: GGNet.Coords.Polar.AngelMapping.Y)
+                 .YLab("#")
+                 .XLab("Year")
+                 .Theme(theme);
+        }
+
         {
             var n = 15;
 
@@ -230,12 +285,12 @@
             var theme = Theme.Default(dark: false);
             theme.Panel.Grid.Major.Y.Width = 0;
 
-            weapon = Plot.New(source, o => o.Value, o => o.Id)
+            weapon = Plot.New(source, o => o.Id, o => o.Value)
                 .Geom_Bar(tooltip: o => $"{o.Value}", fill: "#69b3a2", alpha: 0.7)
-                .Scale_X_Continuous(expand: (0, 0, 0.05, 0.0))
-                .Scale_Y_Discrete(expand: (0.0, 0.1, 0, 0.1), formatter: labeller)
-                .Flip()
-                .XLab("Weapon Quantity")
+                .Scale_X_Discrete(expand: (0.0, 0.1, 0, 0.1), formatter: labeller)
+                .Scale_Y_Continuous(expand: (0, 0, 0.05, 0.0))
+                .YLab("Weapon Quantity")
+                .Coord_Flip()
                 .Caption("SIPRI trend-indicator value")
                 .Theme(theme);
         }

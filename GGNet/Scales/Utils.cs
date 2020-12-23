@@ -1,4 +1,5 @@
-﻿using static System.Math;
+﻿using System;
+using static System.Math;
 
 namespace GGNet.Scales
 {
@@ -8,7 +9,7 @@ namespace GGNet.Scales
         {
             if (b == null || b.Length < 2)
             {
-                return null;
+                return Array.Empty<double>();
             }
 
             var bd = b[1] - b[0];

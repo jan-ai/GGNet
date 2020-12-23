@@ -18,6 +18,9 @@ namespace GGNet.Data
         public double Height { get; set; }
         public double TitlesSize { get; set; }
         
+        public string AxisLabel { get; set; }
+        public double AxisLabelSize { get; set; }
+
         public bool TitlesVisibility => TitlesSize > 0.0;
 
         public bool Show { get; set; }

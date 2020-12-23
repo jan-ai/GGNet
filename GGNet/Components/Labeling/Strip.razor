@@ -1,0 +1,18 @@
+﻿@using System.Globalization
+
+@if (!string.IsNullOrEmpty(XStrip.Label))
+{
+    <g clip-path="url(#@ClipId)">
+        <text x=@XStrip.Zone.X.ToString(CultureInfo.InvariantCulture)
+              y=@XStrip.Zone.Y.ToString(CultureInfo.InvariantCulture)
+              class="stripTextX">@XStrip.Label</text>
+    </g>
+}
+
+@if (!string.IsNullOrEmpty(YStrip.Label))
+{
+    <g clip-path="url(#@ClipId)">
+        <text style="transform: translate(@(YStrip.Zone.X.ToString(CultureInfo.InvariantCulture))px, @(YStrip.Zone.Y.ToString(CultureInfo.InvariantCulture))px) rotate(@(Theme.Strip.Text.Y.Angle.ToString(CultureInfo.InvariantCulture))deg);" 
+              class="stripTextY">@YStrip.Label</text>
+    </g>
+}

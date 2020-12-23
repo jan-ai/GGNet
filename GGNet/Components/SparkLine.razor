@@ -7,26 +7,30 @@
 @inherits PlotBase<T, TX, TY>
 
 <svg id=@Id xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 @Width.ToString(CultureInfo.InvariantCulture) @Height.ToString(CultureInfo.InvariantCulture)">
-    <GGNet.Components.Definitions.SparkLine Id=@Id Theme=@Theme />
+    
+    <CascadingValue Value=@Theme>
+        <GGNet.Components.Definitions.SparkLine Id=@Id />
 
-    <defs>
-        <clipPath id=@(Id + "-" + Panel.Id + "-area")>
-            <rect x=@Area.X.ToString(CultureInfo.InvariantCulture)
-                  y=@Area.Y.ToString(CultureInfo.InvariantCulture)
-                  width=@Area.Width.ToString(CultureInfo.InvariantCulture)
-                  height=@Area.Height.ToString(CultureInfo.InvariantCulture) />
-        </clipPath>
-    </defs>
+        <defs>
+            <clipPath id=@(Id + "-" + Panel.Id + "-area")>
+                <rect x=@Area.X.ToString(CultureInfo.InvariantCulture)
+                      y=@Area.Y.ToString(CultureInfo.InvariantCulture)
+                      width=@Area.Width.ToString(CultureInfo.InvariantCulture)
+                      height=@Area.Height.ToString(CultureInfo.InvariantCulture) />
+            </clipPath>
+        </defs>
 
-    <GGNet.Components.Definitions.Animation Id=@Id Theme=@Theme />
+        <GGNet.Components.Definitions.Animation Id=@Id />
 
-    <rect x=@Area.X.ToString(CultureInfo.InvariantCulture)
-          y=@Area.Y.ToString(CultureInfo.InvariantCulture)
-          width=@Area.Width.ToString(CultureInfo.InvariantCulture)
-          height=@Area.Height.ToString(CultureInfo.InvariantCulture)
-          class="panel" />
+        <rect x=@Area.X.ToString(CultureInfo.InvariantCulture)
+              y=@Area.Y.ToString(CultureInfo.InvariantCulture)
+              width=@Area.Width.ToString(CultureInfo.InvariantCulture)
+              height=@Area.Height.ToString(CultureInfo.InvariantCulture)
+              class="panel" />
 
-    <Area T=T TX=TX TY=TY Data=@Panel Zone=@Area Clip=@(Id + "-" + Panel.Id + "-area") RenderPolicy=@renderChildPolicy />
+        <Area T=T TX=TX TY=TY Data=@Panel Zone=@Area Clip=@(Id + "-" + Panel.Id + "-area") RenderPolicy=@renderChildPolicy />
 
-    <GGNet.Components.Tooltips.SparkLine Id=@Id Coord=@Data.Coord Area=@Area Theme=@Theme @ref=@tooltip />
+        <GGNet.Components.Tooltips.SparkLine Id=@Id Coord=@Data.Coord Area=@Area @ref=@tooltip />
+    
+    </CascadingValue>
 </svg>

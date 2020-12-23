@@ -1,0 +1,41 @@
+﻿@using System.Globalization
+
+@foreach (var (value, label) in Axis.Labels)
+{
+    if (value < 0 || value > 1)
+        continue;
+
+    var x = Area.CoordX(value);
+
+    <g clip-path="url(#@ClipId)">
+        <text x=@x.ToString(CultureInfo.InvariantCulture)
+              y=@zone.Y.ToString(CultureInfo.InvariantCulture)
+              class="axisTextX">@label</text>
+    </g>
+}
+
+@foreach (var (value, title) in Axis.Titles)
+{
+    if (value < 0 || value > 1)
+        continue;
+
+    var x = Area.CoordX(value);
+
+    <g clip-path="url(#@ClipId)">
+        <text x=@x.ToString(CultureInfo.InvariantCulture)
+              y=@zoneTitle.Y.ToString(CultureInfo.InvariantCulture)
+              class="axisTitleX"
+              text-anchor="middle">@title</text>
+    </g>
+}
+
+@if (!string.IsNullOrEmpty(Axis.AxisLabel))
+{
+    <g clip-path="url(#@ClipId)">
+        <text x=@zoneLabel.X.ToString(CultureInfo.InvariantCulture)
+              y=@zoneLabel.Y.ToString(CultureInfo.InvariantCulture)
+              class="axisTitleX">@Axis.AxisLabel</text>
+    </g>
+}
+
+

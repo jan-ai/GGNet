@@ -21,7 +21,10 @@ namespace GGNet.Coords
         (int row, int col) PanelSize((int row, int col) size);
         void SetAxisVisibility<T, TX, TY>(Data<T, TX, TY>.Panel panel, Theme theme, bool showX, bool showY) where TX : struct where TY : struct;
 
+        (double x1, double y1, double x2, double y2) XGrid(Zone zone, double grid);
+        (double x1, double y1, double x2, double y2) YGrid(Zone zone, double grid);
+
         (double x, double y) Transform(Zone zone, double x, double y);
-        Shape Transform(Shape shape);
+        Shape Transform(Zone zone, Shape shape);
     }
 }

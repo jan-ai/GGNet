@@ -1,0 +1,15 @@
+﻿@using System.Globalization
+
+@foreach (var (value, label) in Axis.Labels)
+{
+    if (value < 0 || value > 1)
+        continue;
+
+    var y = zone.Y + Area.CoordY(value) / 2 + Theme.Axis.Text.X.Margin.Bottom;
+
+    <g clip-path="url(#@ClipId)">
+        <text x=@zone.X.ToString(CultureInfo.InvariantCulture)
+              y=@y.ToString(CultureInfo.InvariantCulture)
+              class="axisTextY">@label</text>
+    </g>
+}

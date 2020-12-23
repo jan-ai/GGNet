@@ -1,0 +1,21 @@
+﻿@using System.Globalization
+
+<defs>
+    <clipPath id=@Id>
+        <rect x=@Zone.X.ToString(CultureInfo.InvariantCulture)
+              y=@Zone.Y.ToString(CultureInfo.InvariantCulture)
+              width=@Zone.Width.ToString(CultureInfo.InvariantCulture)
+              height=@Zone.Height.ToString(CultureInfo.InvariantCulture) />
+    </clipPath>
+</defs>
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public Zone Zone { get; set; }
+
+    protected override bool ShouldRender() => false;
+}

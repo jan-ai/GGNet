@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using GGNet.Coords
 
 @typeparam T
 @typeparam TX
@@ -9,42 +10,7 @@
     firstRender = false;
 }
 
-@if (First)
-{
-    if (Plot.Title.Width > 0)
-    {
-        <g clip-path="url(#@(Plot.Id)-plot)">
-            <text x=@((Plot.Title.X + Area.X).ToString(CultureInfo.InvariantCulture)) 
-                  y=@Plot.Title.Y.ToString(CultureInfo.InvariantCulture) 
-                  class="title">@Plot.Data.Title</text>
-        </g>
-    }
-
-    if (Plot.SubTitle.Width > 0)
-    {
-        <g clip-path="url(#@(Plot.Id)-plot)">
-            <text x=@((Plot.SubTitle.X + Area.X).ToString(CultureInfo.InvariantCulture)) 
-                  y=@Plot.SubTitle.Y.ToString(CultureInfo.InvariantCulture) 
-                  class="SubTitle">@Plot.Data.SubTitle</text>
-        </g>
-    }
-}
-
-<defs>
-    <clipPath id=@(clip)>
-        <rect x=@X.ToString(CultureInfo.InvariantCulture) 
-              y=@Y.ToString(CultureInfo.InvariantCulture) 
-              width=@Width.ToString(CultureInfo.InvariantCulture) 
-              height=@Height.ToString(CultureInfo.InvariantCulture) />
-    </clipPath>
-
-    <clipPath id="@(clip)-area">
-        <rect x=@Area.X.ToString(CultureInfo.InvariantCulture)
-              y=@Area.Y.ToString(CultureInfo.InvariantCulture)
-              width=@Area.Width.ToString(CultureInfo.InvariantCulture)
-              height=@Area.Height.ToString(CultureInfo.InvariantCulture) />
-    </clipPath>
-</defs>
+<GGNet.Components.Definitions.Panel ClipId=@clip Zone=@Zone/>
 
 <rect x=@Area.X.ToString(CultureInfo.InvariantCulture)
       y=@Area.Y.ToString(CultureInfo.InvariantCulture)
@@ -52,166 +18,34 @@
       height=@Area.Height.ToString(CultureInfo.InvariantCulture)
       class="panel" />
 
-@if (!string.IsNullOrEmpty(Data.Strip.x))
+<GGNet.Components.Labeling.Strip ClipId=@clip XStrip=Data.XStrip YStrip=Data.YStrip />
+
+@if (Data.xAxis.Show)
 {
-    <g clip-path="url(#@(Plot.Id)-plot)">
-        <text x=@xStrip.X.ToString(CultureInfo.InvariantCulture)
-              y=@xStrip.Y.ToString(CultureInfo.InvariantCulture)
-              class="stripTextX">@Data.Strip.x</text>
-    </g>
+    switch (Data.Data.Coord)
+    {
+        case Cartesian cartesian:
+            <GGNet.Components.Labeling.CartesianXAxis ClipId=@clip Axis=@Data.xAxis Area=@Area Space=@XAxisSpace /> 
+            break;
+        case Polar polar:
+            <GGNet.Components.Labeling.PolarXAxis ClipId=@clip Axis=@Data.xAxis Area=@Area Coord=@polar />
+            break;
+    }
 }
 
-@if (!string.IsNullOrEmpty(Data.Strip.y))
+@if (Data.yAxis.Show)
 {
-    <g clip-path="url(#@(Plot.Id)-plot)">
-        <text style="transform: translate(@(yStrip.X.ToString(CultureInfo.InvariantCulture))px, @(yStrip.Y.ToString(CultureInfo.InvariantCulture))px) rotate(@(Plot.Theme.Strip.Text.Y.Angle.ToString(CultureInfo.InvariantCulture))deg);" class="stripTextY">@Data.Strip.y</text>
-    </g>
-}
-
-@{
-    var y1 = Area.Y;
-    var y2 = Area.Y + Area.Height;
-
-    if (Data.Data.Theme.Panel.Grid.Major.X.Width > 0)
+    switch (Data.Data.Coord)
     {
-        foreach (var b in Data.xAxis.Breaks)
-        {
-            var x = Area.CoordX(b);
-            <line x1=@x.ToString(CultureInfo.InvariantCulture)
-                  x2=@x.ToString(CultureInfo.InvariantCulture) 
-                  y1=@y1.ToString(CultureInfo.InvariantCulture)
-                  y2=@y2.ToString(CultureInfo.InvariantCulture)
-                  class="gridMajorX" 
-                  clip-path="url(#@(clip)-area)" />
-        }
-    }
-
-    if (Data.Data.Theme.Panel.Grid.Minor.X.Width > 0)
-    {
-        foreach (var b in Data.xAxis.MinorBreaks)
-        {
-            var x = Area.CoordX(b);
-            <line x1=@x.ToString(CultureInfo.InvariantCulture)
-                  x2=@x.ToString(CultureInfo.InvariantCulture) 
-                  y1=@y1.ToString(CultureInfo.InvariantCulture)
-                  y2=@y2.ToString(CultureInfo.InvariantCulture)
-                  class="gridMinorX" 
-                  clip-path="url(#@(clip)-area)" />
-        }
-    }
-
-    if (Data.xAxis.Show)
-    {
-        foreach (var (value, label) in Data.xAxis.Labels)
-        {
-            if (value < 0 || value > 1)
-                continue;
-
-            var x = Area.CoordX(value);
-
-            <g clip-path="url(#@(Plot.Id)-plot)">
-                <text x=@x.ToString(CultureInfo.InvariantCulture)
-                      y=@xAxisText.Y.ToString(CultureInfo.InvariantCulture)
-                      class="axisTextX">@label</text>
-            </g>
-        }
-
-        foreach (var (value, label) in Data.xAxis.Titles)
-        {
-            if (value < 0 || value > 1)
-                continue;
-
-            var x = Area.CoordX(value);
-
-            <g clip-path="url(#@(Plot.Id)-plot)">
-                <text x=@x.ToString(CultureInfo.InvariantCulture)
-                      y=@xAxisSubText.Y.ToString(CultureInfo.InvariantCulture)
-                      class="axisTitleX"
-                      text-anchor="middle">@label</text>
-            </g>
-        }
-    }
-}
-
-@{
-    var x1 = Area.X;
-    var x2 = Area.X + Area.Width;
-
-
-    if (Data.Data.Theme.Panel.Grid.Major.Y.Width > 0)
-    {
-        foreach (var b in Data.yAxis.Breaks)
-        {
-            var y = Area.CoordY(b);
-            <line x1=@x1.ToString(CultureInfo.InvariantCulture)
-                  x2=@x2.ToString(CultureInfo.InvariantCulture)
-                  y1=@y.ToString(CultureInfo.InvariantCulture)
-                  y2=@y.ToString(CultureInfo.InvariantCulture)
-                  class="gridMajorY" 
-                  clip-path="url(#@(clip)-area)" />
-        }
-    }
-
-    if (Data.Data.Theme.Panel.Grid.Minor.Y.Width > 0)
-    {
-        foreach (var b in Data.yAxis.MinorBreaks)
-        {
-            var y = Area.CoordY(b);
-            <line x1=@x1.ToString(CultureInfo.InvariantCulture)
-                  x2=@x2.ToString(CultureInfo.InvariantCulture)
-                  y1=@y.ToString(CultureInfo.InvariantCulture)
-                  y2=@y.ToString(CultureInfo.InvariantCulture)
-                  class="gridMinorY" 
-                  clip-path="url(#@(clip)-area)" />
-        }
-    }
-
-    if (Data.yAxis.Show)
-    {
-        var height = Data.Data.Theme.Axis.Text.Y.Size.Height();
-        var offset = height / 4.0;
-
-        foreach (var (value, label) in Data.yAxis.Labels)
-        {
-            var y = Area.CoordY(value) + offset;
-
-            if (Area.Y < (y - height / 2.0) && (y + offset) < (Area.Y + Area.Height))
-            {
-                <g clip-path="url(#@(clip)">
-                    <text x=@yAxisText.X.ToString(CultureInfo.InvariantCulture)
-                          y=@y.ToString(CultureInfo.InvariantCulture)
-                          class="axisTextY">@label</text>
-                </g>
-            }
-        }
+        case Cartesian cartesian:
+            <GGNet.Components.Labeling.CartesianYAxis ClipId=@clip Axis=@Data.yAxis Area=@Area Space=@YAxisSpace />
+           break;
+        case Polar polar:
+            <GGNet.Components.Labeling.PolarYAxis ClipId=@clip Axis=@Data.yAxis Area=@Area Coord=@polar />
+            break;
     }
 }
 
 <Area T=T TX=TX TY=TY Data=@Data Zone=@Area Clip=@(clip + "-area") RenderPolicy=@areaPolicy/>
 
-@if (!string.IsNullOrEmpty(Data.XLab.text))
-{
-    <g clip-path="url(#@(Plot.Id)-plot)">
-        <text x=@xAxisTitle.X.ToString(CultureInfo.InvariantCulture)
-              y=@xAxisTitle.Y.ToString(CultureInfo.InvariantCulture)
-              class="axisTitleX">@Data.XLab.text</text>
-    </g>
-}
-
-@if (!string.IsNullOrEmpty(@Data.YLab.text))
-{
-    <g clip-path="url(#@(Plot.Id)-plot)">
-        <text style="transform: translate(@(yAxisTitle.X.ToString (CultureInfo.InvariantCulture))px, @(yAxisTitle.Y.ToString (CultureInfo.InvariantCulture))px) rotate(@(Data.Data.Theme.Axis.Title.Y.Angle.ToString (CultureInfo.InvariantCulture))deg);" class="axisTitleY">@Data.YLab.text</text>
-    </g>
-}
-
-@if (Last && Plot.Caption.Width > 0)
-{
-    <g clip-path="url(#@(Plot.Id)-plot)">
-        <text x=@((Area.X + Area.Width - Plot.Theme.Plot.Caption.Margin.Right).ToString(CultureInfo.InvariantCulture)) 
-              y=@Plot.Caption.Y.ToString(CultureInfo.InvariantCulture)
-              class="caption">@Plot.Data.Caption</text>
-    </g>
-}
-
-<GGNet.Components.Tooltips.Plot Id=@Plot.Id Coord=@Data.Data.Coord Area=@Area Theme=@Plot.Theme @ref=@tooltip />
+<GGNet.Components.Tooltips.Plot Id=@Plot.Id Coord=@Data.Data.Coord Area=@Area @ref=@tooltip />

@@ -36,7 +36,7 @@ namespace GGNet.Coords
 
         public override (double, double) Transform(Zone zone, double x, double y) => base.Transform(zone, y, x);
 
-        public override Shape Transform(Shape shape)
+        public override Shape Transform(Zone zone, Shape shape)
         {
             switch (shape)
             {
@@ -55,9 +55,37 @@ namespace GGNet.Coords
                     };
 
                     break;
+                case VLine v:
+                    shape = new HLine()
+                    {
+                        Y = v.X,
+                        Label = v.Label,
+                        Text = v.Text,
+                        Line = v.Line,
+                        Classes = v.Classes,
+                        OnClick = v.OnClick,
+                        OnMouseOut = v.OnMouseOut,
+                        OnMouseOver = v.OnMouseOver,
+                    };
+
+                    break;
+                case HLine h:
+                    shape = new VLine()
+                    {
+                        X = h.Y,
+                        Label = h.Label,
+                        Text = h.Text,
+                        Line = h.Line,
+                        Classes = h.Classes,
+                        OnClick = h.OnClick,
+                        OnMouseOut = h.OnMouseOut,
+                        OnMouseOver = h.OnMouseOver,
+                    };
+
+                    break;
             }
 
-            return base.Transform(shape);
+            return base.Transform(zone, shape);
         }
     }
 }

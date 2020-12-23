@@ -7,393 +7,433 @@
 @inherits PlotBase<T, TX, TY>
 
 <svg id=@Id xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 @Width.ToString(CultureInfo.InvariantCulture) @Height.ToString(CultureInfo.InvariantCulture)">
+    
+    <CascadingValue Value=@Theme>
+        
+        <GGNet.Components.Definitions.Plot Id=@Id />
 
-    <GGNet.Components.Definitions.Plot Id=@Id Theme=@Theme />
-
-    <defs>
-        @for (int i = 0; i < Data.Legends.Count; i++)
-        {
-            var l = Data.Legends[i];
-
-            @if (l.Aes.Type != Guide.ColorBar)
-            {
-                continue;
-            }
-
-            var n = l.Items.Count;
-
-            @if (n < 2)
-            {
-                continue;
-            }
-
-            <linearGradient id="gradient-@(Id)-@i"
-                            x1="0%"
-                            y1="0%"
-                            x2=@(Theme.Legend.Direction == Direction.Vertical ? "0%" : "100%")
-                            y2="@(Theme.Legend.Direction == Direction.Vertical ? "100%" : "0%")">
-
-                @{ 
-                    var delta = 100.0 / (n - 1.0);
-
-                    for (var j = 0; j < n; j++)
-                    {
-                        var offset = (j == n - 1 ? 100.0 : j * delta);
-                        var idx = (Theme.Legend.Direction == Direction.Vertical ? j : n - 1 - j);
-                        <stop offset="@offset.ToString(CultureInfo.InvariantCulture)%"
-                              stop-color=@l.Items[idx].elements[0].Value.Fill
-                              stop-opacity=@l.Items[idx].elements[0].Value.Alpha.ToString(CultureInfo.InvariantCulture) />
-                    }
-                }
-
-            </linearGradient>
-        }
-
-    </defs>
-
-    <GGNet.Components.Definitions.Animation Id=@Id Theme=@Theme />
-
-    <clipPath id="@(Id)-plot">
-        <rect x="0" 
-              y="0" 
-              width=@Width.ToString(CultureInfo.InvariantCulture) 
-              height=@Height.ToString(CultureInfo.InvariantCulture) />
-    </clipPath>
-
-    <rect width="100%" height="100%" class="plot" />
-
-    @if (Legend.Width > 0)
-    {
-        if (Theme.Legend.Direction == Direction.Vertical)
-        {
-            var offset = Legend.Y;
-
-            for (int i = 0; i < Data.Legends.Count; i++)
+        <defs>
+            @for (int i = 0; i < Data.Legends.Count; i++)
             {
                 var l = Data.Legends[i];
 
-                if (l.Title?.Width > 0)
+                @if (l.Aes.Type != Guide.ColorBar)
                 {
-                    offset += Theme.Legend.Title.Margin.Top;
-
-                    <g clip-path="url(#@(Id)-plot)">
-                        <text x=@Legend.X.ToString(CultureInfo.InvariantCulture) 
-                              y=@((offset + l.Title.Height).ToString(CultureInfo.InvariantCulture)) 
-                              class="legendTitle">@l.Title.Value</text>
-                    </g>
-
-                    offset += l.Title.Height + Theme.Legend.Title.Margin.Bottom;
+                    continue;
                 }
 
-                if (l.Aes.Type == Guide.Items)
-                {
-                    for (int j = 0; j < l.Items.Count; j++)
-                    {
-                        var (label, elements) = l.Items[j];
+                var n = l.Items.Count;
 
+                @if (n < 2)
+                {
+                    continue;
+                }
+
+                <linearGradient id="gradient-@(Id)-@i"
+                                x1="0%"
+                                y1="0%"
+                                x2=@(Theme.Legend.Direction == Direction.Vertical ? "0%" : "100%")
+                                y2="@(Theme.Legend.Direction == Direction.Vertical ? "100%" : "0%")">
+
+                    @{ 
+                        var delta = 100.0 / (n - 1.0);
+
+                        for (var j = 0; j < n; j++)
+                        {
+                            var offset = (j == n - 1 ? 100.0 : j * delta);
+                            var idx = (Theme.Legend.Direction == Direction.Vertical ? j : n - 1 - j);
+                            <stop offset="@offset.ToString(CultureInfo.InvariantCulture)%"
+                                  stop-color=@l.Items[idx].elements[0].Value.Fill
+                                  stop-opacity=@l.Items[idx].elements[0].Value.Alpha.ToString(CultureInfo.InvariantCulture) />
+                        }
+                    }
+
+                </linearGradient>
+            }
+
+        </defs>
+
+        <GGNet.Components.Definitions.Animation Id=@Id />
+
+        <clipPath id="@(Id)-plot">
+            <rect x="0" 
+                  y="0" 
+                  width=@Width.ToString(CultureInfo.InvariantCulture) 
+                  height=@Height.ToString(CultureInfo.InvariantCulture) />
+        </clipPath>
+
+        <rect width="100%" height="100%" class="plot" />
+
+        @if (Legend.Width > 0)
+        {
+            if (Theme.Legend.Direction == Direction.Vertical)
+            {
+                var offset = Legend.Y;
+
+                for (int i = 0; i < Data.Legends.Count; i++)
+                {
+                    var l = Data.Legends[i];
+
+                    if (l.Title?.Width > 0)
+                    {
+                        offset += Theme.Legend.Title.Margin.Top;
+
+                        <g clip-path="url(#@(Id)-plot)">
+                            <text x=@Legend.X.ToString(CultureInfo.InvariantCulture) 
+                                  y=@((offset + l.Title.Height).ToString(CultureInfo.InvariantCulture)) 
+                                  class="legendTitle">@l.Title.Value</text>
+                        </g>
+
+                        offset += l.Title.Height + Theme.Legend.Title.Margin.Bottom;
+                    }
+
+                    if (l.Aes.Type == Guide.Items)
+                    {
+                        for (int j = 0; j < l.Items.Count; j++)
+                        {
+                            var (label, elements) = l.Items[j];
+
+                            offset += Theme.Legend.Labels.Margin.Top;
+
+                            for (int k = 0; k < elements.Count; k++)
+                            {
+                                var element = elements[k];
+
+                                if (element.Value is Elements.HLine hline)
+                                {
+                                    <line x1=@Legend.Y.ToString(CultureInfo.InvariantCulture)
+                                          x2=@((Legend.X + l.Width).ToString(CultureInfo.InvariantCulture))
+                                          y1=@((offset + elements.Height / 2.0).ToString(CultureInfo.InvariantCulture))
+                                          y2=@((offset + elements.Height / 2.0).ToString(CultureInfo.InvariantCulture))
+                                          stroke-width=@hline.Width.ToString(CultureInfo.InvariantCulture)
+                                          stroke=@hline.Fill
+                                          stroke-opacity=@hline.Alpha.ToString(CultureInfo.InvariantCulture)
+                                          clip-path="url(#@(Id)-plot)" />
+
+                                }
+                                else if (element.Value is Elements.VLine vline)
+                                {
+                                    <line x1=@((Legend.X + l.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                          x2=@((Legend.X + l.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                          y1=@offset.ToString(CultureInfo.InvariantCulture)
+                                          y2=@((offset + elements.Height).ToString(CultureInfo.InvariantCulture))
+                                          stroke-width=@vline.Width.ToString(CultureInfo.InvariantCulture)
+                                          stroke=@vline.Fill
+                                          stroke-opacity=@vline.Alpha.ToString(CultureInfo.InvariantCulture)
+                                          clip-path="url(#@(Id)-plot)" />
+
+                                }
+                                else if (element.Value is Elements.Circle circle)
+                                {
+                                    <circle cx=@((Legend.X + l.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                            cy=@((offset + elements.Height / 2.0).ToString(CultureInfo.InvariantCulture))
+                                            r=@circle.Radius.ToString(CultureInfo.InvariantCulture)
+                                            stroke-width="0.71"
+                                            stroke=@circle.Fill
+                                            stroke-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
+                                            fill=@circle.Fill
+                                            fill-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
+                                            clip-path="url(#@(Id)-plot)" />
+                                }
+                                else if (element.Value is Elements.Rectangle rect)
+                                {
+                                    <rect x=@Legend.X.ToString(CultureInfo.InvariantCulture)
+                                          y=@offset.ToString(CultureInfo.InvariantCulture)
+                                          width=@l.Width.ToString(CultureInfo.InvariantCulture)
+                                          height=@elements.Height.ToString(CultureInfo.InvariantCulture)
+                                          fill=@rect.Fill
+                                          fill-opacity=@rect.Alpha.ToString(CultureInfo.InvariantCulture)
+                                          stroke=@rect.Color
+                                          stroke-width=@rect.Width.ToString(CultureInfo.InvariantCulture)
+                                          clip-path="url(#@(Id)-plot)" />
+                                }
+                            }
+
+                            <g clip-path="url(#@(Id)-legend)">
+                                <text x=@((Legend.X + l.Width + Theme.Legend.Labels.Margin.Left).ToString(CultureInfo.InvariantCulture)) 
+                                      y=@((offset + elements.Height / 2.0 + label.Height / 4.0).ToString(CultureInfo.InvariantCulture)) 
+                                      class="legendLabels">@label.Value</text>
+                            </g>
+
+                            offset += Math.Max(elements.Height, label.Height) + Theme.Legend.Labels.Margin.Bottom;
+                        }
+                    }
+                    else if (l.Aes.Type == Guide.ColorBar)
+                    {
+                        var xOffset = Legend.X + l.Width + Theme.Legend.Labels.Margin.Left;
                         offset += Theme.Legend.Labels.Margin.Top;
 
-                        for (int k = 0; k < elements.Count; k++)
+                        for (int j = 0; j < l.Items.Count; j++)
                         {
-                            var element = elements[k];
+                            var (label, _) = l.Items[j];
+                            var ypos = offset + j * 3.0 * l.Height + (j < l.Items.Count - 1 ? label.Height / (j == 0 ? 1.0 : 2.0) : 0);
 
-                            if (element.Value is Elements.HLine hline)
-                            {
-                                <line x1=@Legend.Y.ToString(CultureInfo.InvariantCulture)
-                                      x2=@((Legend.X + l.Width).ToString(CultureInfo.InvariantCulture))
-                                      y1=@((offset + elements.Height / 2.0).ToString(CultureInfo.InvariantCulture))
-                                      y2=@((offset + elements.Height / 2.0).ToString(CultureInfo.InvariantCulture))
-                                      stroke-width=@hline.Width.ToString(CultureInfo.InvariantCulture)
-                                      stroke=@hline.Fill
-                                      stroke-opacity=@hline.Alpha.ToString(CultureInfo.InvariantCulture)
-                                      clip-path="url(#@(Id)-plot)" />
-
-                            }
-                            else if (element.Value is Elements.VLine vline)
-                            {
-                                <line x1=@((Legend.X + l.Width / 2.0).ToString(CultureInfo.InvariantCulture))
-                                      x2=@((Legend.X + l.Width / 2.0).ToString(CultureInfo.InvariantCulture))
-                                      y1=@offset.ToString(CultureInfo.InvariantCulture)
-                                      y2=@((offset + elements.Height).ToString(CultureInfo.InvariantCulture))
-                                      stroke-width=@vline.Width.ToString(CultureInfo.InvariantCulture)
-                                      stroke=@vline.Fill
-                                      stroke-opacity=@vline.Alpha.ToString(CultureInfo.InvariantCulture)
-                                      clip-path="url(#@(Id)-plot)" />
-
-                            }
-                            else if (element.Value is Elements.Circle circle)
-                            {
-                                <circle cx=@((Legend.X + l.Width / 2.0).ToString(CultureInfo.InvariantCulture))
-                                        cy=@((offset + elements.Height / 2.0).ToString(CultureInfo.InvariantCulture))
-                                        r=@circle.Radius.ToString(CultureInfo.InvariantCulture)
-                                        stroke-width="0.71"
-                                        stroke=@circle.Fill
-                                        stroke-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
-                                        fill=@circle.Fill
-                                        fill-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
-                                        clip-path="url(#@(Id)-plot)" />
-                            }
-                            else if (element.Value is Elements.Rectangle rect)
-                            {
-                                <rect x=@Legend.X.ToString(CultureInfo.InvariantCulture)
-                                      y=@offset.ToString(CultureInfo.InvariantCulture)
-                                      width=@l.Width.ToString(CultureInfo.InvariantCulture)
-                                      height=@elements.Height.ToString(CultureInfo.InvariantCulture)
-                                      fill=@rect.Fill
-                                      fill-opacity=@rect.Alpha.ToString(CultureInfo.InvariantCulture)
-                                      stroke=@rect.Color
-                                      stroke-width=@rect.Width.ToString(CultureInfo.InvariantCulture)
-                                      clip-path="url(#@(Id)-plot)" />
-                            }
+                            <g clip-path="url(#@(Id)-legend)">
+                                <text x=@xOffset.ToString(CultureInfo.InvariantCulture) 
+                                      y=@ypos.ToString(CultureInfo.InvariantCulture) 
+                                      class="legendLabels">@label.Value</text>
+                            </g>
                         }
 
-                        <g clip-path="url(#@(Id)-legend)">
-                            <text x=@((Legend.X + l.Width + Theme.Legend.Labels.Margin.Left).ToString(CultureInfo.InvariantCulture)) 
-                                  y=@((offset + elements.Height / 2.0 + label.Height / 4.0).ToString(CultureInfo.InvariantCulture)) 
-                                  class="legendLabels">@label.Value</text>
-                        </g>
-
-                        offset += Math.Max(elements.Height, label.Height) + Theme.Legend.Labels.Margin.Bottom;
+                        <rect x=@Legend.X.ToString(CultureInfo.InvariantCulture)
+                              y=@offset.ToString(CultureInfo.InvariantCulture)
+                              width=@l.Width.ToString(CultureInfo.InvariantCulture)
+                              height=@((3.0 * (l.Items.Count - 1) * l.Height).ToString(CultureInfo.InvariantCulture))
+                              fill="url(#gradient-@(Id)-@i)"
+                              stroke=@Theme.Legend.Labels.Color
+                              stroke-width="0.2"
+                              clip-path="url(#@(Id)-plot)" />
                     }
-                }
-                else if (l.Aes.Type == Guide.ColorBar)
-                {
-                    var xOffset = Legend.X + l.Width + Theme.Legend.Labels.Margin.Left;
-                    offset += Theme.Legend.Labels.Margin.Top;
-
-                    for (int j = 0; j < l.Items.Count; j++)
-                    {
-                        var (label, _) = l.Items[j];
-                        var ypos = offset + j * 3.0 * l.Height + (j < l.Items.Count - 1 ? label.Height / (j == 0 ? 1.0 : 2.0) : 0);
-
-                        <g clip-path="url(#@(Id)-legend)">
-                            <text x=@xOffset.ToString(CultureInfo.InvariantCulture) 
-                                  y=@ypos.ToString(CultureInfo.InvariantCulture) 
-                                  class="legendLabels">@label.Value</text>
-                        </g>
-                    }
-
-                    <rect x=@Legend.X.ToString(CultureInfo.InvariantCulture)
-                          y=@offset.ToString(CultureInfo.InvariantCulture)
-                          width=@l.Width.ToString(CultureInfo.InvariantCulture)
-                          height=@((3.0 * (l.Items.Count - 1) * l.Height).ToString(CultureInfo.InvariantCulture))
-                          fill="url(#gradient-@(Id)-@i)"
-                          stroke=@Theme.Legend.Labels.Color
-                          stroke-width="0.2"
-                          clip-path="url(#@(Id)-plot)" />
                 }
             }
-        }
-        else
-        {
-            var offset = Legend.X;
-            var middle = Legend.Y + Legend.Height / 2.0;
-
-            for (int i = 0; i < Data.Legends.Count; i++)
+            else
             {
-                var l = Data.Legends[i];
+                var offset = Legend.X;
+                var middle = Legend.Y + Legend.Height / 2.0;
 
-                if (l.Title?.Height > 0)
+                for (int i = 0; i < Data.Legends.Count; i++)
                 {
-                    offset += Theme.Legend.Title.Margin.Left;
+                    var l = Data.Legends[i];
 
-                    <g clip-path="url(#@(Id)-plot)">
-                        <text x=@offset.ToString(CultureInfo.InvariantCulture)
-                              y=@((middle + l.Title.Height / 4.0).ToString(CultureInfo.InvariantCulture)) 
-                              class="legendTitle">@l.Title.Value</text>
-                    </g>
-
-                    offset += l.Title.Width + Theme.Legend.Title.Margin.Right;
-                }
-
-                if (l.Aes.Type == Guide.Items)
-                {
-                    for (int j = 0; j < l.Items.Count; j++)
+                    if (l.Title?.Height > 0)
                     {
-                        var (label, elements) = l.Items[j];
+                        offset += Theme.Legend.Title.Margin.Left;
 
-                        for (int k = 0; k < elements.Count; k++)
+                        <g clip-path="url(#@(Id)-plot)">
+                            <text x=@offset.ToString(CultureInfo.InvariantCulture)
+                                  y=@((middle + l.Title.Height / 4.0).ToString(CultureInfo.InvariantCulture)) 
+                                  class="legendTitle">@l.Title.Value</text>
+                        </g>
+
+                        offset += l.Title.Width + Theme.Legend.Title.Margin.Right;
+                    }
+
+                    if (l.Aes.Type == Guide.Items)
+                    {
+                        for (int j = 0; j < l.Items.Count; j++)
                         {
-                            var element = elements[k];
+                            var (label, elements) = l.Items[j];
 
-                            if (element.Value is Elements.HLine hline)
+                            for (int k = 0; k < elements.Count; k++)
                             {
-                                <line x1=@offset.ToString(CultureInfo.InvariantCulture)
-                                      x2=@((offset + elements.Width).ToString(CultureInfo.InvariantCulture))
-                                      y1=@middle.ToString(CultureInfo.InvariantCulture)
-                                      y2=@middle.ToString(CultureInfo.InvariantCulture)
-                                      stroke-width=@hline.Width.ToString(CultureInfo.InvariantCulture)
-                                      stroke=@hline.Fill
-                                      stroke-opacity=@hline.Alpha.ToString(CultureInfo.InvariantCulture)
-                                      stroke-dasharray=@(hline.LineType.DashArray())
-                                      clip-path="url(#@(Id)-plot)" />
+                                var element = elements[k];
 
-                            }
-                            else if (element.Value is Elements.VLine vline)
-                            {
-                                <line x1=@((offset + elements.Width / 2.0).ToString(CultureInfo.InvariantCulture))
-                                      x2=@((offset + elements.Width / 2.0).ToString(CultureInfo.InvariantCulture))
-                                      y1=@Legend.Y.ToString(CultureInfo.InvariantCulture)
-                                      y2=@((Legend.Y + Legend.Height).ToString(CultureInfo.InvariantCulture))
-                                      stroke-width=@vline.Width.ToString(CultureInfo.InvariantCulture)
-                                      stroke=@vline.Fill
-                                      stroke-opacity=@vline.Alpha.ToString(CultureInfo.InvariantCulture)
-                                      stroke-dasharray=@(vline.LineType.DashArray())
-                                      clip-path="url(#@(Id)-plot)" />
+                                if (element.Value is Elements.HLine hline)
+                                {
+                                    <line x1=@offset.ToString(CultureInfo.InvariantCulture)
+                                          x2=@((offset + elements.Width).ToString(CultureInfo.InvariantCulture))
+                                          y1=@middle.ToString(CultureInfo.InvariantCulture)
+                                          y2=@middle.ToString(CultureInfo.InvariantCulture)
+                                          stroke-width=@hline.Width.ToString(CultureInfo.InvariantCulture)
+                                          stroke=@hline.Fill
+                                          stroke-opacity=@hline.Alpha.ToString(CultureInfo.InvariantCulture)
+                                          stroke-dasharray=@(hline.LineType.DashArray())
+                                          clip-path="url(#@(Id)-plot)" />
 
+                                }
+                                else if (element.Value is Elements.VLine vline)
+                                {
+                                    <line x1=@((offset + elements.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                          x2=@((offset + elements.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                          y1=@Legend.Y.ToString(CultureInfo.InvariantCulture)
+                                          y2=@((Legend.Y + Legend.Height).ToString(CultureInfo.InvariantCulture))
+                                          stroke-width=@vline.Width.ToString(CultureInfo.InvariantCulture)
+                                          stroke=@vline.Fill
+                                          stroke-opacity=@vline.Alpha.ToString(CultureInfo.InvariantCulture)
+                                          stroke-dasharray=@(vline.LineType.DashArray())
+                                          clip-path="url(#@(Id)-plot)" />
+
+                                }
+                                else if (element.Value is Elements.Circle circle)
+                                {
+                                    <circle cx=@((offset + elements.Width / 2.0).ToString(CultureInfo.InvariantCulture))
+                                            cy=@middle.ToString(CultureInfo.InvariantCulture)
+                                            r=@circle.Radius.ToString(CultureInfo.InvariantCulture)
+                                            stroke-width="0.71"
+                                            stroke=@circle.Fill
+                                            stroke-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
+                                            fill=@circle.Fill
+                                            fill-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
+                                            clip-path="url(#@(Id)-plot)" />
+                                }
+                                else if (element.Value is Elements.Rectangle rect)
+                                {
+                                    <rect x=@offset.ToString(CultureInfo.InvariantCulture)
+                                          y=@((middle - elements.Height / 2.0).ToString (CultureInfo.InvariantCulture))
+                                          width=@elements.Width.ToString(CultureInfo.InvariantCulture)
+                                          height=@elements.Height.ToString(CultureInfo.InvariantCulture)
+                                          fill=@rect.Fill
+                                          fill-opacity=@rect.Alpha.ToString(CultureInfo.InvariantCulture)
+                                          stroke=@rect.Color
+                                          stroke-width=@rect.Width.ToString(CultureInfo.InvariantCulture)
+                                          clip-path="url(#@(Id)-plot)" />
+                                }
                             }
-                            else if (element.Value is Elements.Circle circle)
-                            {
-                                <circle cx=@((offset + elements.Width / 2.0).ToString(CultureInfo.InvariantCulture))
-                                        cy=@middle.ToString(CultureInfo.InvariantCulture)
-                                        r=@circle.Radius.ToString(CultureInfo.InvariantCulture)
-                                        stroke-width="0.71"
-                                        stroke=@circle.Fill
-                                        stroke-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
-                                        fill=@circle.Fill
-                                        fill-opacity=@circle.Alpha.ToString(CultureInfo.InvariantCulture)
-                                        clip-path="url(#@(Id)-plot)" />
-                            }
-                            else if (element.Value is Elements.Rectangle rect)
-                            {
-                                <rect x=@offset.ToString(CultureInfo.InvariantCulture)
-                                      y=@((middle - elements.Height / 2.0).ToString (CultureInfo.InvariantCulture))
-                                      width=@elements.Width.ToString(CultureInfo.InvariantCulture)
-                                      height=@elements.Height.ToString(CultureInfo.InvariantCulture)
-                                      fill=@rect.Fill
-                                      fill-opacity=@rect.Alpha.ToString(CultureInfo.InvariantCulture)
-                                      stroke=@rect.Color
-                                      stroke-width=@rect.Width.ToString(CultureInfo.InvariantCulture)
-                                      clip-path="url(#@(Id)-plot)" />
-                            }
+
+                            offset += elements.Width;
+
+                            offset += Theme.Legend.Labels.Margin.Left;
+
+                            <g clip-path="url(#@(Id)-legend)">
+                                <text x=@offset.ToString(CultureInfo.InvariantCulture)
+                                      y=@((middle + label.Height / 4.0).ToString(CultureInfo.InvariantCulture)) 
+                                      class="legendLabels">@label.Value</text>
+                            </g>
+
+                            offset += label.Width + Theme.Legend.Labels.Margin.Right;
                         }
-
-                        offset += elements.Width;
-
+                    }
+                    else if (l.Aes.Type == Guide.ColorBar)
+                    {
                         offset += Theme.Legend.Labels.Margin.Left;
 
-                        <g clip-path="url(#@(Id)-legend)">
-                            <text x=@offset.ToString(CultureInfo.InvariantCulture)
-                                  y=@((middle + label.Height / 4.0).ToString(CultureInfo.InvariantCulture)) 
-                                  class="legendLabels">@label.Value</text>
-                        </g>
+                        var yOffset = Legend.Y + l.Items[0].label.Height;
 
-                        offset += label.Width + Theme.Legend.Labels.Margin.Right;
+                        for (int j = 0; j < l.Items.Count; j++)
+                        {
+                            var (label, _) = l.Items[l.Items.Count - 1 - j];
+                            var xpos = offset + j * 3.0 * l.Width - (j > 0 ? label.Width / (j == l.Items.Count - 1 ? 1.0 : 2.0) : 0);
+
+                            <g clip-path="url(#@(Id)-legend)">
+                                <text x=@xpos.ToString(CultureInfo.InvariantCulture) 
+                                      y=@yOffset.ToString(CultureInfo.InvariantCulture) 
+                                      class="legendLabels">@label.Value</text>
+                            </g>
+                        }
+
+                        yOffset += Theme.Legend.Labels.Margin.Bottom;
+
+                        <rect x=@offset.ToString(CultureInfo.InvariantCulture)
+                              y=@yOffset.ToString(CultureInfo.InvariantCulture)
+                              width=@((3.0 * l.Width * (l.Items.Count - 1)).ToString(CultureInfo.InvariantCulture))
+                              height=@l.Height.ToString(CultureInfo.InvariantCulture)
+                              fill="url(#gradient-@(Id)-@i)"
+                              stroke=@Theme.Legend.Labels.Color
+                              stroke-width="0.2"
+                              clip-path="url(#@(Id)-plot)" />
                     }
-                }
-                else if (l.Aes.Type == Guide.ColorBar)
-                {
-                    offset += Theme.Legend.Labels.Margin.Left;
-
-                    var yOffset = Legend.Y + l.Items[0].label.Height;
-
-                    for (int j = 0; j < l.Items.Count; j++)
-                    {
-                        var (label, _) = l.Items[l.Items.Count - 1 - j];
-                        var xpos = offset + j * 3.0 * l.Width - (j > 0 ? label.Width / (j == l.Items.Count - 1 ? 1.0 : 2.0) : 0);
-
-                        <g clip-path="url(#@(Id)-legend)">
-                            <text x=@xpos.ToString(CultureInfo.InvariantCulture) 
-                                  y=@yOffset.ToString(CultureInfo.InvariantCulture) 
-                                  class="legendLabels">@label.Value</text>
-                        </g>
-                    }
-
-                    yOffset += Theme.Legend.Labels.Margin.Bottom;
-
-                    <rect x=@offset.ToString(CultureInfo.InvariantCulture)
-                          y=@yOffset.ToString(CultureInfo.InvariantCulture)
-                          width=@((3.0 * l.Width * (l.Items.Count - 1)).ToString(CultureInfo.InvariantCulture))
-                          height=@l.Height.ToString(CultureInfo.InvariantCulture)
-                          fill="url(#gradient-@(Id)-@i)"
-                          stroke=@Theme.Legend.Labels.Color
-                          stroke-width="0.2"
-                          clip-path="url(#@(Id)-plot)" />
                 }
             }
         }
-    }
 
-    <CascadingValue Value=@this>
-        @{
-            var xAxisSpace = new double[Data.Coord.PanelRows(Data)];
-            var yAxisSpace = new double[Data.Coord.PanelColumns(Data)];
-
-            for (var i = 0; i < Data.Panels.Count; i++)
-            {
-                var panel = Data.Panels[i];
-
-                if (panel.xAxis.Show)
-                    xAxisSpace[panel.Position.row] = Math.Max(xAxisSpace[panel.Position.row], panel.xAxis.Height + Data.Theme.Axis.Text.Y.Margin.Top + Data.Theme.Axis.Text.Y.Margin.Bottom);
-
-                if (panel.yAxis.Show)
-                    yAxisSpace[panel.Position.col] = Math.Max(yAxisSpace[panel.Position.col], panel.yAxis.Width + Data.Theme.Axis.Text.Y.Margin.Left + Data.Theme.Axis.Text.Y.Margin.Right);
-            }
-
-            var width = wrapper.Width - Data.Strip - (Data.Coord.PanelColumns(Data) - 1.0) * Theme.Panel.Spacing.X - yAxisSpace.Sum();
-            var height = wrapper.Height - Data.Strip - (Data.Coord.PanelRows(Data) - 1.0) * Theme.Panel.Spacing.Y - xAxisSpace.Sum();
-
-            if (!Data.Panels[^1].xAxis.TitlesVisibility && !string.IsNullOrEmpty(Data.XLab))
-            {
-                height -= Data.Panels[^1].xAxis.TitlesSize;
-            }
-
-            for (var i = 0; i < Data.Panels.Count; i++)
-            {
-                var panel = Data.Panels[i];
-                var (row, col) = panel.Position;
-
-                var w = panel.Width * width;
-                var h = panel.Height * height;
-
-                var x = wrapper.X;
-                var y = wrapper.Y;
-
-                if (row > 0 || col > 0)
-                {
-                    for (var j = 0; j < Data.Panels.Count; j++)
-                    {
-                        var _panel = Data.Panels[j];
-                        var (_row, _col) = _panel.Position;
-
-                        if (_col < col && _row == row)
-                            x += _panel.Width * width + yAxisSpace[_panel.Position.col] + Theme.Panel.Spacing.X;
-
-                        if (_row < row && _col == col)
-                            y += _panel.Height * height + xAxisSpace[_panel.Position.row] + Theme.Panel.Spacing.Y;
-                    }
-                }
-
-                if (row == 0)
-                {
-                    h += Data.Strip;
-                }
-
-                if (row == (Data.Coord.PanelRows(Data) - 1))
-                {
-                    if (!panel.xAxis.TitlesVisibility && !string.IsNullOrEmpty(Data.XLab))
-                    {
-                        h += panel.xAxis.TitlesSize;
-                    }
-                }
-
-                if (col == (Data.Coord.PanelColumns(Data) - 1))
-                {
-                    w += Data.Strip;
-                }
-
-                <Panel Data=@panel
-                       X=@x
-                       Y=@y
-                       Width=@w
-                       Height=@h
-                       XAxisSpace=@xAxisSpace[panel.Position.row]
-                       YAxisSpace=@yAxisSpace[panel.Position.col]
-                       First=@(i == 0)
-                       Last=@(i == (Data.Panels.Count - 1))
-                       T=T TX=TX TY=TY />
-            }
+        @if (Title.Width > 0)
+        {
+            <g clip-path="url(#@(Id)-plot)">
+                <text x=@Title.X.ToString(CultureInfo.InvariantCulture) 
+                      y=@Title.Y.ToString(CultureInfo.InvariantCulture) 
+                      class="title">@Data.Title</text>
+            </g>
         }
+
+        @if (SubTitle.Width > 0)
+        {
+            <g clip-path="url(#@(Id)-plot)">
+                <text x=@SubTitle.X.ToString(CultureInfo.InvariantCulture) 
+                      y=@SubTitle.Y.ToString(CultureInfo.InvariantCulture) 
+                      class="SubTitle">@Data.SubTitle</text>
+            </g>
+        }
+
+        <CascadingValue Value=@this>
+            @{
+                var xAxisSpace = new double[Data.Coord.PanelRows(Data)];
+                var yAxisSpace = new double[Data.Coord.PanelColumns(Data)];
+
+                for (var i = 0; i < Data.Panels.Count; i++)
+                {
+                    var panel = Data.Panels[i];
+
+                    if (panel.xAxis.Show)
+                    {
+                        var h = Data.Theme.Axis.Text.X.Margin.Top + panel.xAxis.Height + Data.Theme.Axis.Text.X.Margin.Bottom;
+
+                        if (panel.xAxis.TitlesVisibility)
+                            h += Data.Theme.Axis.Title.X.Margin.Top + panel.xAxis.TitlesSize + Data.Theme.Axis.Title.X.Margin.Bottom;
+
+                        xAxisSpace[panel.Position.row] = Math.Max(xAxisSpace[panel.Position.row], h);
+                    }
+
+                    if (panel.yAxis.Show)
+                        yAxisSpace[panel.Position.col] = Math.Max(yAxisSpace[panel.Position.col], panel.yAxis.Width + Data.Theme.Axis.Text.Y.Margin.Left + Data.Theme.Axis.Text.Y.Margin.Right);
+                }
+
+                var width = wrapper.Width - Data.Strip - (Data.Coord.PanelColumns(Data) - 1.0) * Theme.Panel.Spacing.X - yAxisSpace.Sum();
+                var height = wrapper.Height - Data.Strip - (Data.Coord.PanelRows(Data) - 1.0) * Theme.Panel.Spacing.Y - xAxisSpace.Sum();
+
+                if (!Data.Panels[^1].xAxis.TitlesVisibility && !string.IsNullOrEmpty(Data.XLab))
+                {
+                    height -= Data.Panels[^1].xAxis.TitlesSize;
+                }
+
+                for (var i = 0; i < Data.Panels.Count; i++)
+                {
+                    var panel = Data.Panels[i];
+                    var (row, col) = panel.Position;
+
+                    var w = panel.Width * width;
+                    var h = panel.Height * height;
+
+                    var x = wrapper.X;
+                    var y = wrapper.Y;
+
+                    if (row > 0 || col > 0)
+                    {
+                        for (var j = 0; j < Data.Panels.Count; j++)
+                        {
+                            var _panel = Data.Panels[j];
+                            var (_row, _col) = _panel.Position;
+
+                            if (_col < col && _row == row)
+                                x += _panel.Width * width + yAxisSpace[_panel.Position.col] + Theme.Panel.Spacing.X;
+
+                            if (_row < row && _col == col)
+                                y += _panel.Height * height + xAxisSpace[_panel.Position.row] + Theme.Panel.Spacing.Y;
+                        }
+                    }
+
+                    if (row == 0)
+                    {
+                        h += Data.Strip;
+                    }
+
+                    if (row == (Data.Coord.PanelRows(Data) - 1))
+                    {
+                        if (!panel.xAxis.TitlesVisibility && !string.IsNullOrEmpty(Data.XLab))
+                        {
+                            h += panel.xAxis.TitlesSize;
+                        }
+                    }
+
+                    if (col == (Data.Coord.PanelColumns(Data) - 1))
+                    {
+                        w += Data.Strip;
+                    }
+
+                    var zone = new Zone()
+                    {
+                        X = x,
+                        Y = y,
+                        Width = w + yAxisSpace[panel.Position.col],
+                        Height = h + xAxisSpace[panel.Position.row]
+                    };
+
+                    <Panel Data=@panel
+                           Zone=@zone
+                           XAxisSpace=@xAxisSpace[panel.Position.row]
+                           YAxisSpace=@yAxisSpace[panel.Position.col]
+                           T=T TX=TX TY=TY />
+                }
+            }
+        </CascadingValue>
+
+        @if (Caption.Width > 0)
+        {
+            <g clip-path="url(#@(Id)-plot)">
+                <text x=@((wrapper.X + wrapper.Width - Theme.Plot.Caption.Margin.Right).ToString(CultureInfo.InvariantCulture)) 
+                      y=@Caption.Y.ToString(CultureInfo.InvariantCulture)
+                      class="caption">@Data.Caption</text>
+            </g>
+        }
+    
     </CascadingValue>
-
 </svg>
