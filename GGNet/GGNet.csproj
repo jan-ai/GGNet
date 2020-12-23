@@ -4,22 +4,23 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <RazorLangVersion>3.0</RazorLangVersion>
     <Owner>PabloFromMars</Owner>
-    <Authors>Pablo Belin; Jan Hesse</Authors>
+    <Authors>Pablo Belin, Jan Hesse</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Title>GG.Net Data Visualization</Title>
     <Description>GG.Net lets Data Scientists and Developers create interactive and flexible charts for Blazor Web Apps and .Net in C# and F#.</Description>
     <Summary>GG.Net lets Data Scientists and Developers create interactive and flexible charts for Blazor Web Apps and .Net in C# and F#</Summary>
     <PackageTags>Blazor;plotting;plot;plots;charting;chart;charts;sparkline;sparklines;visualization;ML.Net;csharp;fsharp</PackageTags>
     <RepositoryUrl>https://github.com/jan-ai/GGNet</RepositoryUrl>
-    <PackageProjectUrl>https://pablofrommars.github.io/</PackageProjectUrl>
-    <Copyright>Copyright (c) 2020 Pablo Belin</Copyright>
+    <PackageProjectUrl>https://github.com/jan-ai/GGNet</PackageProjectUrl>
+    <Copyright>Copyright (c) 2020 Pablo Belin, Jan Hesse</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Product>GGNet Data Visualization</Product>
     <RepositoryType>git</RepositoryType>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <Company />
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <OutputType>Library</OutputType>
+    <PackageId>Twins.Blazor.GGNet</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,7 +31,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.10" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="3.1.10" />
     <PackageReference Include="NodaTime" Version="3.0.3" />
-    <PackageReference Include="System.Threading.Channels" Version="4.7.1" />
+    <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
   </ItemGroup>
 
 

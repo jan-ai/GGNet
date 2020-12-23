@@ -13,11 +13,13 @@ namespace GGNet.Scales
         private static readonly DoubleFormatter defaultFormatter = new DoubleFormatter("0.##e0");
 
         public Log10((double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             IFormatter<double> formatter = null)
             : base(Transformations.Log10.Instance, expand ?? (0.05, 0, 0.05, 0))
         {
             Limits = limits ?? (null, null);
+            ExpandLimits = expandLimits ?? (null, null);
 
             this.formatter = formatter ?? defaultFormatter;
         }
@@ -26,7 +28,7 @@ namespace GGNet.Scales
 
         public override void Set(bool grid)
         {
-            SetRange(Limits.min ?? _min ?? 0.0, Limits.max ?? _max ?? 0.0);
+            SetRange(Limits.min ?? ExpandLimits.min ?? _min ?? 0.0, Limits.max ?? ExpandLimits.max ?? _max ?? 0.0);
 
             if (!grid)
             {

@@ -106,7 +106,7 @@ namespace GGNet
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null)
             where TY : struct
         {
-            data.Positions.X.Factory = () => new DateTimePosition(null, limits, expand);
+            data.Positions.X.Factory = () => new DateTimePosition(null, limits, null, expand);
 
             return data;
         }
@@ -115,11 +115,12 @@ namespace GGNet
             this Data<T, double, TY> data,
             ITransformation<double> transformation = null,
             (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             IFormatter<double> formatter = null)
             where TY : struct
         {
-            data.Positions.X.Factory = () => new Extended(transformation, limits, expand, formatter);
+            data.Positions.X.Factory = () => new Extended(transformation, limits, expandLimits, expand, formatter);
 
             return data;
         }
@@ -129,10 +130,11 @@ namespace GGNet
             string format,
             ITransformation<double> transformation = null,
             (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null)
             where TY : struct
         {
-            data.Scale_X_Continuous(transformation, limits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
+            data.Scale_X_Continuous(transformation, limits, expandLimits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
 
             return data;
         }
@@ -198,11 +200,12 @@ namespace GGNet
             this Data<T, TX, double> data,
             ITransformation<double> transformation = null,
             (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             IFormatter<double> formatter = null)
             where TX : struct
         {
-            data.Positions.Y.Factory = () => new Extended(transformation, limits, expand, formatter);
+            data.Positions.Y.Factory = () => new Extended(transformation, limits, expandLimits, expand, formatter);
 
             return data;
         }
@@ -212,10 +215,11 @@ namespace GGNet
            string format,
            ITransformation<double> transformation = null,
            (double? min, double? max)? limits = null,
+           (double? min, double? max)? expandLimits = null,
            (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null)
            where TX : struct
         {
-            data.Positions.Y.Factory = () => new Extended(transformation, limits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
+            data.Positions.Y.Factory = () => new Extended(transformation, limits, expandLimits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
 
             return data;
         }
@@ -224,11 +228,12 @@ namespace GGNet
             this Data<T, TX, double>.PanelFactory panel,
              ITransformation<double> transformation = null,
             (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             IFormatter<double> formatter = null)
             where TX : struct
         {
-            panel.Y = () => new Extended(transformation, limits, expand, formatter);
+            panel.Y = () => new Extended(transformation, limits, expandLimits, expand, formatter);
 
             return panel;
         }
@@ -238,10 +243,11 @@ namespace GGNet
            string format,
             ITransformation<double> transformation = null,
            (double? min, double? max)? limits = null,
+           (double? min, double? max)? expandLimits = null,
            (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null)
            where TX : struct
         {
-            panel.Scale_Y_Continuous(transformation, limits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
+            panel.Scale_Y_Continuous(transformation, limits, expandLimits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
 
             return panel;
         }
@@ -249,19 +255,21 @@ namespace GGNet
         public static Data<T, double, TY> Scale_X_Sqrt<T, TY>(
             this Data<T, double, TY> data,
             (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             string format = null)
             where TY : struct
-            => data.Scale_X_Continuous(format, Sqrt.Instance, limits, expand);
+            => data.Scale_X_Continuous(format, Sqrt.Instance, limits, expandLimits, expand);
 
         public static Data<T, double, TY> Scale_X_Log10<T, TY>(
             this Data<T, double, TY> data,
             (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             string format = null)
             where TY : struct
         {
-            data.Positions.X.Factory = () => new Scales.Log10(limits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
+            data.Positions.X.Factory = () => new Scales.Log10(limits, expandLimits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
 
             return data;
         }
@@ -269,27 +277,30 @@ namespace GGNet
         public static Data<T, TX, double>.PanelFactory Scale_Y_Sqrt<T, TX>(
             this Data<T, TX, double>.PanelFactory panel,
             (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             string format = null)
             where TX : struct
-            => panel.Scale_Y_Continuous(format, Sqrt.Instance, limits, expand);
+            => panel.Scale_Y_Continuous(format, Sqrt.Instance, limits, expandLimits, expand);
 
         public static Data<T, TX, double> Scale_Y_Sqrt<T, TX>(
             this Data<T, TX, double> data,
             (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             string format = null)
             where TX : struct
-            => data.Scale_Y_Continuous(format, Sqrt.Instance, limits, expand);
+            => data.Scale_Y_Continuous(format, Sqrt.Instance, limits, expandLimits, expand);
 
         public static Data<T, TX, double>.PanelFactory Scale_Y_Log10<T, TX>(
             this Data<T, TX, double>.PanelFactory panel,
             (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             string format = null)
             where TX : struct
          {
-            panel.Y = () => new Scales.Log10(limits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
+            panel.Y = () => new Scales.Log10(limits, expandLimits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
 
             return panel;
          }
@@ -297,11 +308,12 @@ namespace GGNet
         public static Data<T, TX, double> Scale_Y_Log10<T, TX>(
             this Data<T, TX, double> data,
             (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             string format = null)
             where TX : struct
         {
-            data.Positions.Y.Factory = () => new Scales.Log10(limits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
+            data.Positions.Y.Factory = () => new Scales.Log10(limits, expandLimits, expand, !string.IsNullOrEmpty(format) ? new DoubleFormatter(format) : null);
 
             return data;
         }
@@ -321,21 +333,24 @@ namespace GGNet
 
         public static Data<T, double, TY> Scale_Longitude<T, TY>(
             this Data<T, double, TY> data,
-            (double? min, double? max)? limits = null)
+            (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null)
             where TY : struct
-            => data.Scale_X_Continuous(null, limits ?? (-180, 180), (0, 0, 0, 0), Longitude.Instance);
+            => data.Scale_X_Continuous(null, limits ?? (-180, 180), expandLimits, (0, 0, 0, 0), Longitude.Instance);
 
         public static Data<T, TX, double>.PanelFactory Scale_Latitude<T, TX>(
            this Data<T, TX, double>.PanelFactory panel,
-           (double? min, double? max)? limits = null)
+           (double? min, double? max)? limits = null,
+           (double? min, double? max)? expandLimits = null)
            where TX : struct
-           => panel.Scale_Y_Continuous(null, limits ?? (-90, 90), (0, 0, 0, 0), Latitude.Instance);
+           => panel.Scale_Y_Continuous(null, limits ?? (-90, 90), expandLimits, (0, 0, 0, 0), Latitude.Instance);
 
         public static Data<T, TX, double> Scale_Latitude<T, TX>(
             this Data<T, TX, double> data,
-            (double? min, double? max)? limits = null)
+            (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null)
             where TX : struct
-            => data.Scale_Y_Continuous(null, limits ?? (-90, 90), (0, 0, 0, 0), Latitude.Instance);
+            => data.Scale_Y_Continuous(null, limits ?? (-90, 90), expandLimits, (0, 0, 0, 0), Latitude.Instance);
 
         public static Data<T, TX, double> YLim<T, TX>(this Data<T, TX, double> data, double? min = null, double? max = null)
            where TX : struct

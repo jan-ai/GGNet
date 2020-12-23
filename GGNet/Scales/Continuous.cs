@@ -11,5 +11,6 @@ namespace GGNet.Scales
         }
 
         public (TKey? min, TKey? max) Limits { get; set; }
+        public (TKey? min, TKey? max) ExpandLimits { get; set; }
     }
 }

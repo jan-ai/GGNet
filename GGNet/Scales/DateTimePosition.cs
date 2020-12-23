@@ -17,10 +17,12 @@ namespace GGNet.Scales
 
         public DateTimePosition(ITransformation<LocalDateTime> transformation = null,
             (LocalDateTime? min, LocalDateTime? max)? limits = null,
+            (LocalDateTime? min, LocalDateTime? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null)
             : base(transformation, expand ?? (0.0, 5, 0, 5))
         {
             Limits = limits ?? (null, null);
+            ExpandLimits = expandLimits ?? (null, null);
         }
 
         public override Guide Guide => Guide.None;

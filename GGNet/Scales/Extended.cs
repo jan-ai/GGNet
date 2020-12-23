@@ -17,11 +17,13 @@ namespace GGNet.Scales
 
         public Extended(ITransformation<double> transformation = null,
             (double? min, double? max)? limits = null,
+            (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             IFormatter<double> formatter = null)
             : base(transformation, expand ?? (0.05, 0, 0.05, 0))
         {
             Limits = limits ?? (null, null);
+            ExpandLimits = expandLimits ?? (null, null);
 
             this.formatter = formatter ?? Standard<double>.Instance;
         }
@@ -30,7 +32,8 @@ namespace GGNet.Scales
 
         public override void Set(bool grid)
         {
-            SetRange(Limits.min ?? _min ?? 0.0, Limits.max ?? _max ?? 0.0);
+            SetRange(Limits.min ?? Math.Min (ExpandLimits.min ?? _min ?? 0.0, _min ?? 0.0), 
+                Limits.max ?? Math.Max (ExpandLimits.max ?? _max ?? 0.0, _max ?? 0.0));
 
             if (!grid)
             {
