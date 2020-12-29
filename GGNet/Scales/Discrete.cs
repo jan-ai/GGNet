@@ -73,7 +73,7 @@ namespace GGNet.Scales
             Labels = labels;
         }
 
-        public override TValue Map(TKey key)
+        public override TValue Map(TKey key, bool ignoreLimits = false)
         {
             if (!palette.TryGetValue(key, out var result))
             {

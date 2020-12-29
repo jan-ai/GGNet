@@ -6,7 +6,7 @@ using GGNet.Transformations;
 
 namespace GGNet.Scales
 {
-    public class Log10 : Position<double>
+    public class Log10 : ContinuousPosition<double>
     {
         private readonly IFormatter<double> formatter;
 
@@ -16,11 +16,8 @@ namespace GGNet.Scales
             (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             IFormatter<double> formatter = null)
-            : base(Transformations.Log10.Instance, expand ?? (0.05, 0, 0.05, 0))
+            : base(Transformations.Log10.Instance, expand ?? (0.05, 0, 0.05, 0), limits, expandLimits)
         {
-            Limits = limits ?? (null, null);
-            ExpandLimits = expandLimits ?? (null, null);
-
             this.formatter = formatter ?? defaultFormatter;
         }
 
@@ -28,12 +25,10 @@ namespace GGNet.Scales
 
         public override void Set(bool grid)
         {
-            SetRange(Limits.min ?? ExpandLimits.min ?? _min ?? 0.0, Limits.max ?? ExpandLimits.max ?? _max ?? 0.0);
+            base.Set(grid);
 
             if (!grid)
-            {
                 return;
-            }
 
             var breaks = Log10Utils.Breaks(Range.min, Range.max);
             if (breaks.Length > 0)
@@ -57,7 +52,24 @@ namespace GGNet.Scales
             Labels = labels;
         }
 
-        public override double Map(double key) => transformation.Apply(key);
+        public override double Map(double key, bool ignoreLimits = false)
+        {
+            if (transformation != null)
+                key = transformation.Apply(key);
+
+            if (!ignoreLimits && Limits != null)
+            {
+                var (min, max) = Limits.Invoke();
+
+                if (min.HasValue && min.Value > key)
+                    return double.NaN;
+
+                if (max.HasValue && max.Value < key)
+                    return double.NaN;
+            }
+
+            return key;
+        }
 
         public override ITransformation<double> RangeTransformation => transformation;
     }
@@ -114,7 +126,7 @@ namespace GGNet.Scales
                 by -= 1.0;
             }
 
-            return new double[0];
+            return Array.Empty<double>();
         }
     }
 }

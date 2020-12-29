@@ -45,6 +45,10 @@ namespace GGNet
 
         public static Data<T, LocalDateTime, double> New<T>(IEnumerable<T> items, Func<T, LocalDateTime> x, Func<T, double> y = null) => _New(new Source<T>(items), x, y);
 
+        public static Data<T, DateTime, double> New<T>(Source<T> source, Func<T, DateTime> x, Func<T, double> y = null) => _New(source, x, y);
+
+        public static Data<T, DateTime, double> New<T>(IEnumerable<T> items, Func<T, DateTime> x, Func<T, double> y = null) => _New(new Source<T>(items), x, y);
+
         public static Data<T, TX, double> New<T, TX>(Source<T> source, Func<T, TX> x, Func<T, double> y = null)
             where TX : struct, Enum
         {
@@ -106,7 +110,20 @@ namespace GGNet
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null)
             where TY : struct
         {
-            data.Positions.X.Factory = () => new DateTimePosition(null, limits, null, expand);
+            data.Positions.X.Factory = () => new DateTimeDiscretePosition(null, limits, expand, null);
+
+            return data;
+        }
+
+        public static Data<T, DateTime, TY> Scale_X_Continuous<T, TY>(
+            this Data<T, DateTime, TY> data,
+            ITransformation<DateTime> transformation = null,
+            (DateTime? min, DateTime? max)? limits = null,
+            (DateTime? min, DateTime? max)? expandLimits = null,
+            (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null)
+            where TY : struct
+        {
+            data.Positions.X.Factory = () => new DateTimePosition(transformation, limits, expandLimits, expand);
 
             return data;
         }
@@ -141,7 +158,7 @@ namespace GGNet
 
         public static Data<T, TX, TY> Scale_X_Discrete<T,TX, TY>(
            this Data<T, TX, TY> data,
-           (TX? min, TX? max)? limits = null,
+           (TX? min, TX? max)? limits,
            (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
            IFormatter<TX> formatter = null)
            where TX : struct
@@ -152,7 +169,25 @@ namespace GGNet
             return data;
         }
 
+        public static Data<T, TX, TY> Scale_X_Discrete<T, TX, TY>(
+           this Data<T, TX, TY> data,
+           (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
+           IFormatter<TX> formatter = null)
+           where TX : struct
+           where TY : struct
+        {
+            data.Positions.X.Factory = () => new DiscretePosition<TX>(null, null, expand, formatter);
+
+            return data;
+        }
+
         public static Data<T, double, TY> XLim<T, TY>(this Data<T, double, TY> data, double? min = null, double? max = null)
+            where TY : struct
+        {
+            return data.XLim(() => (min, max));
+        }
+
+        public static Data<T, double, TY> XLim<T, TY>(this Data<T, double, TY> data, Func<(double? min, double? max)> limits)
             where TY : struct
         {
             if (data.Positions.X.Factory == null)
@@ -166,7 +201,7 @@ namespace GGNet
             {
                 var scale = old();
 
-                scale.Limits = (min, max);
+                scale.Limits = limits;
 
                 return scale;
             };
@@ -175,6 +210,12 @@ namespace GGNet
         }
 
         public static Data<T, LocalDate, TY> XLim<T, TY>(this Data<T, LocalDate, TY> data, LocalDate? min = null, LocalDate? max = null)
+            where TY : struct
+        {
+            return data.XLim(() => (min, max));
+        }
+
+        public static Data<T, LocalDate, TY> XLim<T, TY>(this Data<T, LocalDate, TY> data, Func<(LocalDate? min, LocalDate? max)> limits)
             where TY : struct
         {
             if (data.Positions.X.Factory == null)
@@ -188,7 +229,87 @@ namespace GGNet
             {
                 var scale = old();
 
-                scale.Limits = (min, max);
+                scale.Limits = limits;
+
+                return scale;
+            };
+
+            return data;
+        }
+
+        public static Data<T, DateTime, TY> XLim<T, TY>(this Data<T, DateTime, TY> data, DateTime? min = null, DateTime? max = null)
+            where TY : struct
+        {
+            return data.XLim(() => (min, max));
+        }
+
+        public static Data<T, DateTime, TY> XLim<T, TY>(this Data<T, DateTime, TY> data, Func<(DateTime? min, DateTime? max)> limits)
+            where TY : struct
+        {
+            if (data.Positions.X.Factory == null)
+                data.Scale_X_Continuous();
+
+            var old = data.Positions.X.Factory;
+
+            data.Positions.X.Factory = () =>
+            {
+                var scale = old();
+
+                scale.Limits = limits;
+
+                return scale;
+            };
+
+            return data;
+        }
+
+        public static Data<T, double, TY> XExpandLim<T, TY>(this Data<T, double, TY> data, double? min = null, double? max = null)
+            where TY : struct
+        {
+            return data.XExpandLim(() => (min, max));
+        }
+
+        public static Data<T, double, TY> XExpandLim<T, TY>(this Data<T, double, TY> data, Func<(double? min, double? max)> expandLimits)
+            where TY : struct
+        {
+            if (data.Positions.X.Factory == null)
+            {
+                data.Scale_X_Continuous();
+            }
+
+            var old = data.Positions.X.Factory;
+
+            data.Positions.X.Factory = () =>
+            {
+                var scale = old() as ContinuousPosition<double>;
+
+                scale.ExpandLimits = expandLimits;
+
+                return scale;
+            };
+
+            return data;
+        }
+
+        public static Data<T, DateTime, TY> XExpandLim<T, TY>(this Data<T, DateTime, TY> data, DateTime? min = null, DateTime? max = null)
+    where TY : struct
+        {
+            return data.XExpandLim(() => (min, max));
+        }
+
+        public static Data<T, DateTime, TY> XExpandLim<T, TY>(this Data<T, DateTime, TY> data, Func<(DateTime? min, DateTime? max)> expandLimits)
+            where TY : struct
+        {
+            if (data.Positions.X.Factory == null)
+                data.Scale_X_Continuous();
+
+            var old = data.Positions.X.Factory;
+
+            data.Positions.X.Factory = () =>
+            {
+                var scale = old() as ContinuousPosition<DateTime>;
+
+                scale.ExpandLimits = expandLimits;
 
                 return scale;
             };
@@ -355,6 +476,12 @@ namespace GGNet
         public static Data<T, TX, double> YLim<T, TX>(this Data<T, TX, double> data, double? min = null, double? max = null)
            where TX : struct
         {
+            return data.YLim(() => (min, max));
+        }
+
+        public static Data<T, TX, double> YLim<T, TX>(this Data<T, TX, double> data, Func<(double? min, double? max)> limits)
+           where TX : struct
+        {
             if (data.Positions.Y.Factory == null)
             {
                 data.Scale_Y_Continuous();
@@ -366,7 +493,7 @@ namespace GGNet
             {
                 var scale = old();
 
-                scale.Limits = (min, max);
+                scale.Limits = limits;
 
                 return scale;
             };
@@ -375,6 +502,12 @@ namespace GGNet
         }
 
         public static Data<T, TX, double>.PanelFactory YLim<T, TX>(this Data<T, TX, double>.PanelFactory panel, double? min = null, double? max = null)
+            where TX : struct
+        {
+            return panel.YLim(() => (min, max));
+        }
+        
+        public static Data<T, TX, double>.PanelFactory YLim<T, TX>(this Data<T, TX, double>.PanelFactory panel, Func<(double? min, double? max)> limits)
             where TX : struct
         {
             if (panel.Y == null)
@@ -388,7 +521,59 @@ namespace GGNet
             {
                 var scale = old();
 
-                scale.Limits = (min, max);
+                scale.Limits = limits;
+
+                return scale;
+            };
+
+            return panel;
+        }
+
+        public static Data<T, TX, double> YExpandLim<T, TX>(this Data<T, TX, double> data, double? min = null, double? max = null)
+           where TX : struct
+        {
+            return data.YExpandLim(() => (min, max));
+        }
+
+        public static Data<T, TX, double> YExpandLim<T, TX>(this Data<T, TX, double> data, Func<(double? min, double? max)> expandLimits)
+           where TX : struct
+        {
+            if (data.Positions.Y.Factory == null)
+                data.Scale_Y_Continuous();
+
+            var old = data.Positions.Y.Factory;
+
+            data.Positions.Y.Factory = () =>
+            {
+                var scale = old() as ContinuousPosition<double>;
+
+                scale.ExpandLimits = expandLimits;
+
+                return scale;
+            };
+
+            return data;
+        }
+
+        public static Data<T, TX, double>.PanelFactory YExpandLim<T, TX>(this Data<T, TX, double>.PanelFactory panel, double? min = null, double? max = null)
+            where TX : struct
+        {
+            return panel.YExpandLim(() => (min, max));
+        }
+
+        public static Data<T, TX, double>.PanelFactory YExpandLim<T, TX>(this Data<T, TX, double>.PanelFactory panel, Func<(double? min, double? max)> expandLimits)
+            where TX : struct
+        {
+            if (panel.Y == null)
+                panel.Scale_Y_Continuous();
+
+            var old = panel.Y;
+
+            panel.Y = () =>
+            {
+                var scale = old() as ContinuousPosition<double>;
+
+                scale.ExpandLimits = expandLimits;
 
                 return scale;
             };

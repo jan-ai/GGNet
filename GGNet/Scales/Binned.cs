@@ -18,7 +18,7 @@
 
         public override void Set(bool grid) { }
 
-        public override T Map(double key)
+        public override T Map(double key, bool ignoreLimits = false)
         {
             if (!palette.TryGetValue(key, out var result))
             {

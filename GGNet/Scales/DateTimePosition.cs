@@ -1,173 +1,106 @@
 ﻿using System.Collections.Generic;
 
-using NodaTime;
-using NodaTime.Text;
-
 using GGNet.Transformations;
+using System;
 
 namespace GGNet.Scales
 {
-    public class DateTimePosition : Position<LocalDateTime>
+    public class DateTimePosition : ContinuousPosition<DateTime>
     {
-        private static readonly LocalTimePattern timePattern = LocalTimePattern.CreateWithInvariantCulture("HH:mm");
-        private static readonly LocalDatePattern datePattern = LocalDatePattern.CreateWithInvariantCulture("MM/dd");
-        private static readonly Period sampling = Period.FromMinutes(1);
-
-        protected readonly SortedBuffer<LocalDateTime> values = new SortedBuffer<LocalDateTime>(512, 1);
-
-        public DateTimePosition(ITransformation<LocalDateTime> transformation = null,
-            (LocalDateTime? min, LocalDateTime? max)? limits = null,
-            (LocalDateTime? min, LocalDateTime? max)? expandLimits = null,
+        public DateTimePosition(ITransformation<DateTime> transformation = null,
+            (DateTime? min, DateTime? max)? limits = null,
+            (DateTime? min, DateTime? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null)
-            : base(transformation, expand ?? (0.0, 5, 0, 5))
+            : base(transformation, expand ?? (0.0, 0.0, 0, 0.0), limits, expandLimits)
         {
-            Limits = limits ?? (null, null);
-            ExpandLimits = expandLimits ?? (null, null);
         }
 
         public override Guide Guide => Guide.None;
 
-        private LocalDate? first = null;
-        private LocalDate? last = null;
-
-        private LocalDateTime? min = null;
-        private LocalDateTime? max = null;
-
-        public override void Train(LocalDateTime key)
+        public override void Set(bool grid)
         {
-            if (values.Count > 0)
+            base.Set(grid);
+
+            if (!grid)
+                return;
+
+            var labels = new List<(double x, string label)>();
+            var titles = new List<(double x, string title)>();
+            var breaks = new List<double>();
+            var minor = new List<double>();
+
+            var start = Range.min.ConvertFromDouble();
+            var end = Range.max.ConvertFromDouble();
+            var diff = end - start;
+            var titleStart = TimeSpan.Zero;
+            var lastTitleDate = start;
+            var span = Math.Floor((end - start).TotalSeconds);
+            span = span switch
             {
-                var date = key.Date;
-                if (first > date)
-                {
-                    first = date;
-                }
+                _ when span > 4 * 24 * 60 * 60 => span - span % (4 * 24 * 60 * 60),
+                _ when span > 24 * 60 * 60 => span - span % (24 * 60 * 60),
+                _ when span > 60 * 60 => span - span % (60 * 60),
+                _ when span > 60 => span - span % 60,
+                _ => span
+            };
 
-                date = key.Date;
-                if (last < date)
-                {
-                    last = date;
-                }
+            double numBreaks = 4;
 
-                if (min > key)
-                {
-                    min = key;
-                }
+            if (span > 24 * 60 * 60)
+                numBreaks = Math.Min(4, Math.Floor((end - start).TotalSeconds / (24 * 60 * 60)));
 
-                if (max < key)
-                {
-                    max = key;
-                }
+            var step = span / (end - start).TotalSeconds / numBreaks;
+            var year = new DateTime(start.Year, 1, 1, 0, 0, 0, start.Kind);
+            var firstDate = year.AddSeconds(span * Math.Floor((start - year).TotalSeconds / span));
+            var firstBreak = (double) (firstDate - start).Ticks / (end - start).Ticks;
+            var startWithMinor = false;
 
-                var current = values[values.Count - 1];
-                if (current.Date == key.Date)
-                {
-                    current = current.Plus(sampling);
+            while (firstBreak < 0)
+            {
+                firstBreak += step / 2;
+                startWithMinor = !startWithMinor;
+            }
 
-                    while(current <= key)
+            for (double i = firstBreak; i <= 1; i += step / 2)
+            {
+                var offset = i * diff;
+                var dt = start + offset;
+                var bp = dt.ConvertToDouble();
+
+                if ((!startWithMinor && breaks.Count == minor.Count)
+                    || (startWithMinor && breaks.Count != minor.Count))
+                {
+                    breaks.Add(bp);
+                    if (diff.TotalDays < 3)
                     {
-                        values.Add(current);
+                        labels.Add((bp, dt.ToLongTimeString()));
+                        if (lastTitleDate.Date != dt.Date)
+                        {
+                            titles.Add(((start + (offset + titleStart) / 2).ConvertToDouble(), lastTitleDate.ToShortDateString()));
+                            titleStart = offset;
+                            lastTitleDate = dt;
+                        }
+                    }
+                    else
+                    {
+                        labels.Add((bp, dt.Day.ToString()));
 
-                        current = current.Plus(sampling);
+                        if (lastTitleDate.Year != dt.Year || lastTitleDate.Month != dt.Month)
+                        {
+                            titles.Add(((start + (offset + titleStart) / 2).ConvertToDouble(), lastTitleDate.ToString("Y")));
+                            titleStart = offset;
+                            lastTitleDate = dt;
+                        }
                     }
                 }
                 else
                 {
-                    values.Add(key);
-                }
-            }
-            else
-            {
-                values.Add(key);
-
-                max = key;
-                first = key.Date;
-                last = key.Date;
-                min = key;
-                max = key;
-            }
-        }
-
-        public override void Set(bool grid)
-        {
-            var min = _min ?? 0.0;
-            var max = _max ?? 0.0;
-
-            var start = 0;
-            var end = values.Count;
-
-            if (Limits.min.HasValue)
-            {
-                var index = values.IndexOf(Limits.min.Value);
-                if (index >= 0)
-                {
-                    min = index;
-                    start = index;
+                    minor.Add(bp);
                 }
             }
 
-            if (Limits.max.HasValue)
-            {
-                var index = values.IndexOf(Limits.max.Value);
-                if (index >= 0)
-                {
-                    max = index;
-                    end = index + 1;
-                }
-            }
-
-            SetRange(min, max);
-
-            if (!grid)
-            {
-                return;
-            }
-
-            var breaks = new List<double>();
-            var minor = new List<double>();
-            var labels = new List<(double x, string label)>();
-            var titles = new List<(double x, string title)>();
-
-            var dfirst = -1;
-            var dlast = -1;
-
-            var day = new LocalDate();
-
-            for (int i = start; i < end; i++)
-            {
-                var date = values[i];
-
-                if (date.Date != day)
-                {
-                    if (dlast >= 0 && dlast != dfirst)
-                    {
-                        titles.Add(((dlast + dfirst) / 2.0, datePattern.Format(day)));
-                    }
-
-                    day = date.Date;
-
-                    dfirst = i;
-                }
-
-                if (date.Minute % 30 == 0)
-                {
-                    breaks.Add(i);
-                    labels.Add((i, timePattern.Format(date.TimeOfDay)));
-                }
-                else if (date.Minute % 15 == 0)
-                {
-                    minor.Add(i);
-                }
-
-                values.Add(date);
-
-                dlast = i;
-            }
-
-            if (dlast >= 0 && dlast != dfirst)
-            {
-                titles.Add(((dlast + dfirst) / 2.0, datePattern.Format(day)));
-            }
+            titles.Add(((start + (diff + titleStart) / 2).ConvertToDouble(),
+                diff.TotalDays < 3 ? lastTitleDate.ToShortDateString() : lastTitleDate.ToString("Y")));
 
             Breaks = breaks;
             MinorBreaks = minor;
@@ -175,28 +108,30 @@ namespace GGNet.Scales
             Titles = titles;
         }
 
-        public override double Map(LocalDateTime key)
+        public override double Map(DateTime key, bool ignoreLimits = false)
         {
-            var index = values.IndexOf(key);
-            if (index < 0)
+            if (transformation != null)
+                key = transformation.Apply(key);
+
+            if (!ignoreLimits && Limits != null)
             {
-                return double.NaN;
+                var (min, max) = Limits.Invoke();
+
+                if (min.HasValue && min.Value > key)
+                    return double.NaN;
+
+                if (max.HasValue && max.Value < key)
+                    return double.NaN;
             }
 
-            return index;
+            return key.ConvertToDouble();
         }
+    }
 
-        public override void Clear()
-        {
-            base.Clear();
+    public static class DateTimeExtensions 
+    {
+        public static double ConvertToDouble(this DateTime dt) => dt.ToBinary() / 10000;
 
-            first = null;
-            last = null;
-
-            min = null;
-            max = null;
-
-            values.Clear();
-        }
+        public static DateTime ConvertFromDouble(this double ddt) => DateTime.FromBinary(((long) ddt) * 10000);
     }
 }

@@ -4,6 +4,7 @@ using GGNet.Transformations;
 using GGNet.Formats;
 
 using static System.Math;
+using System.Linq;
 
 /*
  *  Talbot, Lin, and Hanrahan. An Extension of Wilkinson’s Algorithm for Positioning Tick Labels on Axes, Infovis 2010.
@@ -11,7 +12,7 @@ using static System.Math;
 
 namespace GGNet.Scales
 {
-    public class Extended : Position<double>
+    public class Extended : ContinuousPosition<double>
     {
         private readonly IFormatter<double> formatter;
 
@@ -20,11 +21,8 @@ namespace GGNet.Scales
             (double? min, double? max)? expandLimits = null,
             (double minMult, double minAdd, double maxMult, double maxAdd)? expand = null,
             IFormatter<double> formatter = null)
-            : base(transformation, expand ?? (0.05, 0, 0.05, 0))
+            : base(transformation, expand ?? (0.05, 0, 0.05, 0), limits, expandLimits)
         {
-            Limits = limits ?? (null, null);
-            ExpandLimits = expandLimits ?? (null, null);
-
             this.formatter = formatter ?? Standard<double>.Instance;
         }
 
@@ -32,13 +30,10 @@ namespace GGNet.Scales
 
         public override void Set(bool grid)
         {
-            SetRange(Limits.min ?? Math.Min (ExpandLimits.min ?? _min ?? 0.0, _min ?? 0.0), 
-                Limits.max ?? Math.Max (ExpandLimits.max ?? _max ?? 0.0, _max ?? 0.0));
+            base.Set(grid);
 
             if (!grid)
-            {
                 return;
-            }
 
             var breaks = Wilkinson.extended(Range.min, Range.max);
             if (breaks == null)
@@ -65,7 +60,24 @@ namespace GGNet.Scales
             Labels = labels;
         }
 
-        public override double Map(double key) => transformation.Apply(key);
+        public override double Map(double key, bool ignoreLimits = false)
+        {
+            if (transformation != null)
+                key = transformation.Apply(key);
+
+            if (!ignoreLimits && Limits != null)
+            {
+                var (min, max) = Limits.Invoke();
+
+                if (min.HasValue && min.Value > key)
+                    return double.NaN;
+
+                if (max.HasValue && max.Value < key)
+                    return double.NaN;
+            }
+
+            return key;
+        }
 
         public override ITransformation<double> RangeTransformation => transformation;
     }

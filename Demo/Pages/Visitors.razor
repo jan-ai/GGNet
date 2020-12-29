@@ -1,0 +1,147 @@
+﻿@page "/visitors"
+@implements IAsyncDisposable
+
+@using System.Threading
+@using System.Threading.Tasks
+
+@using GGNet
+@using GGNet.Components
+
+<div class="border rounded-lg m-5 p-1 d-inline-block" style="width: 720px; box-sizing: content-box;">
+    <Plot Data=@visitorsLong 
+          T=@(KeyValuePair<DateTime, double>) 
+          TX=DateTime 
+          TY=double 
+          Width="720"
+          RenderPolicy=RenderPolicy.Auto 
+          @ref=@plotLong />
+</div>
+<div class="border rounded-lg m-5 p-1 d-inline-block" style="width: 360px; box-sizing: content-box;">
+    <Plot Data=@visitorsShort 
+          T=@(KeyValuePair<DateTime, double>) 
+          TX=DateTime 
+          TY=double 
+          Width="360"
+          RenderPolicy=RenderPolicy.Auto 
+          @ref=@plotShort />
+</div>
+
+@code {
+
+    private Data<KeyValuePair<DateTime, double>, DateTime, double> visitorsShort, visitorsLong;
+    private Plot<KeyValuePair<DateTime, double>, DateTime, double> plotShort, plotLong;
+    private Source<KeyValuePair<DateTime, double>> source = new Source<KeyValuePair<DateTime, double>>();
+
+    private Dictionary<DateTime, double> bars = new Dictionary<DateTime, double>();
+    private (DateTime min, DateTime max) limitsShort, limitsLong;
+
+    private readonly CancellationTokenSource cancellation = new CancellationTokenSource();
+    private Task task1, task2;
+
+    protected override void OnInitialized()
+    {
+        SetLimits();
+
+        visitorsShort = Plot.New(source, x: o => o.Key, y: o => o.Value)
+            .Title("Visitors (Realtime)")
+            .Geom_Bar()
+            .Scale_X_Continuous()
+            .XLim(() => limitsShort)
+            .XExpandLim(() => limitsShort)
+            .Caption("Source: Random")
+            .Theme(axisY: Position.Right, dark: false);
+
+        visitorsLong = Plot.New(source, x: o => o.Key.AddSeconds(-o.Key.Second), y: o => o.Value)
+            .Title("Visitors (Realtime)")
+            .Geom_Bar()
+            .Scale_X_Continuous()
+            .XLim(() => limitsLong)
+            .XExpandLim(() => limitsLong)
+            .Caption("Source: Random")
+            .Theme(axisY: Position.Right, dark: false);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        task1 = Task.Factory.StartNew(async () =>
+        {
+            try
+            {
+                var token = cancellation.Token;
+
+                var rnd = new Random();
+
+                while (!token.IsCancellationRequested)
+                {
+                    var now = DateTime.Now;
+                    now = now.AddTicks(-(now.Ticks % 10000000));
+
+                    if (!bars.TryGetValue(now, out var visitors))
+                        visitors = 0;
+
+                    bars[now] = visitors + 1;
+
+                    source.Clear();
+                    foreach (var bar in bars)
+                        source.Add(bar);
+
+                    await Task.Delay(rnd.Next(0, 14) * rnd.Next(0, 14) * rnd.Next(0, 14)).ConfigureAwait(false);
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }, TaskCreationOptions.LongRunning);
+
+        task2 = Task.Factory.StartNew(async () =>
+        {
+            try
+            {
+                var token = cancellation.Token;
+                int i = 0;
+
+                while (!token.IsCancellationRequested)
+                {
+                    SetLimits();
+
+                    await plotShort.RefreshAsync().ConfigureAwait(false);
+                    if (++i == 5)
+                    {
+                        i = 0;
+                        await plotLong.RefreshAsync().ConfigureAwait(false);
+                    }
+
+                    await Task.Delay(200).ConfigureAwait(false);
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }, TaskCreationOptions.LongRunning);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        cancellation?.Cancel();
+        cancellation?.Dispose();
+
+        if (task1 != null)
+            await task1.ConfigureAwait(false);
+
+        if (task2 != null)
+            await task2.ConfigureAwait(false);
+    }
+
+    private void SetLimits ()
+    {
+        var now = DateTime.Now;
+        now = now.AddTicks(-(now.Ticks % 1000000));
+        limitsShort = (now.AddSeconds(-60), now);
+        limitsLong = (now.AddMinutes(-30), now);
+    }
+}

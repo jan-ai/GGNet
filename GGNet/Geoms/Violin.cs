@@ -144,6 +144,9 @@ namespace GGNet.Geoms
             var x = Positions.X.Map(item);
             var y = Positions.Y.Map(item);
 
+            if (double.IsNaN(x) || double.IsNaN(y))
+                return;
+
             SortedBuffer<(double y, double width)> violin;
 
             if (violins.TryGetValue(x, out var xviolins))

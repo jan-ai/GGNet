@@ -40,7 +40,7 @@ namespace GGNet.Scales
 
         public abstract void Set(bool grid);
 
-        public abstract TValue Map(TKey key);
+        public abstract TValue Map(TKey key, bool ignoreLimits = false);
 
         public abstract void Clear();
     }

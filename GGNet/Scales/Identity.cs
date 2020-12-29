@@ -10,7 +10,7 @@
 
         public override void Set(bool grid) { }
 
-        public override T Map(T key) => key;
+        public override T Map(T key, bool ignoreLimits = false) => key;
 
         public override void Clear() { }
     }

@@ -82,7 +82,7 @@ namespace GGNet.Scales
             Labels = labels;
         }
 
-        public override string Map(double key)
+        public override string Map(double key, bool ignoreLimits = false)
         {
             if (limits.max > limits.min)
             {
@@ -159,7 +159,7 @@ namespace GGNet.Scales
             Labels = labels;
         }
 
-        public override string Map(double key)
+        public override string Map(double key, bool ignoreLimits = false)
         {
             if (limits.max > limits.min)
             {

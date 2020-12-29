@@ -17,7 +17,7 @@ namespace GGNet.Scales
         {
         }
 
-        protected void DayMonth(int start, int end)
+        protected void DayMonth()
         {
             /*
             var delta = (int)Pretty.delta(start, end);
@@ -28,7 +28,7 @@ namespace GGNet.Scales
             }
             */
 
-            var delta = (end - start + 1) switch
+            var delta = values.Count switch
             {
                 var _n when _n <= 7 => 1,
                 var _n when _n <= 14 => 2,
@@ -45,7 +45,7 @@ namespace GGNet.Scales
             int? month = null;
 
             var j = 1;
-            for (int i = start; i < end; i++)
+            for (int i = 0; i < values.Count; i++)
             {
                 var date = values[i];
 
@@ -68,14 +68,14 @@ namespace GGNet.Scales
             }
 
             if (month.HasValue)
-                titles.Add(((end - 1 + mfirst) / 2.0, Abbreviations[month.Value - 1]));
+                titles.Add(((values.Count - 1 + mfirst) / 2.0, Abbreviations[month.Value - 1]));
 
             Breaks = breaks;
             Labels = labels;
             Titles = titles;
         }
 
-        protected void MonthYear(int start, int end)
+        protected void MonthYear()
         {
             var yfirst = -1;
             var mfirst = -1;
@@ -87,7 +87,7 @@ namespace GGNet.Scales
             var breaks = new List<double>();
             var titles = new List<(double x, string year)>();
 
-            for (int i = start; i < end; i++)
+            for (int i = 0; i < values.Count; i++)
             {
                 var date = values[i];
 
@@ -115,15 +115,15 @@ namespace GGNet.Scales
                 }
             }
 
-            titles.Add(((end - 1 + yfirst) / 2.0, year.ToString()));
-            labels.Add(((end - 1 + mfirst) / 2.0, Abbreviations[month.Value - 1]));
+            titles.Add(((values.Count - 1 + yfirst) / 2.0, year.ToString()));
+            labels.Add(((values.Count - 1 + mfirst) / 2.0, Abbreviations[month.Value - 1]));
 
             Breaks = breaks;
             Labels = labels;
             Titles = titles;
         }
 
-        protected void QuarterYear(int start, int end)
+        protected void QuarterYear()
         {
             var yfirst = -1;
 
@@ -134,7 +134,7 @@ namespace GGNet.Scales
             var labels = new List<(double x, string quarter)>();
             var titles = new List<(double x, string year)>();
 
-            for (int i = start; i < end; i++)
+            for (int i = 0; i < values.Count; i++)
             {
                 var date = values[i];
 
@@ -164,28 +164,28 @@ namespace GGNet.Scales
                 }
             }
 
-            titles.Add(((end - 1 + yfirst) / 2.0, year.ToString()));
+            titles.Add(((values.Count - 1 + yfirst) / 2.0, year.ToString()));
 
             Breaks = breaks;
             Labels = labels;
             Titles = titles;
         }
 
-        protected override void Labeling(int start, int end)
+        protected override void Labeling()
         {
-            var n = end - start;
+            var n = values.Count;
 
             if (n <= 128)
             {
-                DayMonth(start, end);
+                DayMonth();
             }
             else if (n <= 384)
             {
-                MonthYear(start, end);
+                MonthYear();
             }
             else
             {
-                QuarterYear(start, end);
+                QuarterYear();
             }
         }
     }

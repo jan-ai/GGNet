@@ -13,32 +13,36 @@ namespace GGNet.Scales
         double Coord(double value);
     }
 
-    public abstract class Position<TKey> : Continuous<TKey>, IPosition
+    public abstract class Position<TKey> : Scale<TKey, double>, IPosition
         where TKey : struct
     {
         protected readonly (double minMult, double minAdd, double maxMult, double maxAdd) expand;
+        protected double? _min = null;
+        protected double? _max = null;
 
-        public Position(ITransformation<TKey> transformation, (double minMult, double minAdd, double maxMult, double maxAdd) expand)
-               : base(transformation)
+        public Position(ITransformation<TKey> transformation, (double minMult, double minAdd, double maxMult, double maxAdd) expand,
+            (TKey? min, TKey? max)? limits = null)
+           : base(transformation)
         {
+            Limits = () => limits ?? (null, null);
             this.expand = expand;
         }
 
-        public override void Train(TKey key) { }
-
+        public Func<(TKey? min, TKey? max)> Limits { get; set; }
         public (double min, double max) Range { get; protected set; }
-
         public virtual ITransformation<double> RangeTransformation { get; } = Transformations.Identity<double>.Instance;
 
-        protected void SetRange(double min, double max)
+        public void Shape(double min, double max)
         {
-            if (max < min)
-            {
-                var tmp = min;
-                min = max;
-                max = tmp;
-            }
+            if (!_min.HasValue || _min > min)
+                _min = min;
 
+            if (!_max.HasValue || _max < max)
+                _max = max;
+        }
+
+        protected virtual void SetRange(double min, double max)
+        {
             var range = max - min;
 
             Range = (
@@ -47,24 +51,15 @@ namespace GGNet.Scales
             );
         }
 
-        protected double? _min = null;
-        protected double? _max = null;
-
-        public virtual void Shape(double min, double max)
+        public override void Set(bool grid)
         {
-            if (!double.IsNaN(min))
-                _min = Min(_min ?? min, min);
-
-            if (!double.IsNaN(max))
-                _max = Max(_max ?? max, max);
+            SetRange(_min.Value, _max.Value);
         }
 
         public virtual double Coord(double value)
         {
             if (Range.min == Range.max)
-            {
                 return 0;
-            }
 
             return (value - Range.min) / (Range.max - Range.min);
         }

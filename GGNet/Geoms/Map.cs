@@ -156,8 +156,12 @@ namespace GGNet.Geoms
                 var polygon = polygons[i];
                 for (var j = 0; j < polygon.Longitude.Length; j++)
                 {
-                    var x = polygon.Longitude[j];
-                    var y = polygon.Latitude[j];
+
+                    var x = (Positions.X.Position as Position<double>).Map(polygon.Longitude[j]);
+                    var y = (Positions.Y.Position as Position<double>).Map(polygon.Latitude[j]);
+
+                    if (double.IsNaN(x) || double.IsNaN(y))
+                        continue;
 
                     if (x < xmin)
                     {
