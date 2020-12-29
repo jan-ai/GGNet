@@ -5,29 +5,13 @@ using Microsoft.AspNetCore.Components;
 
 namespace GGNet.Components.Labeling
 {
-    public partial class CartesianYAxis : ComponentBase
+    public partial class CartesianYAxis : AxisBase
     {
-        [CascadingParameter]
-        public Theme Theme { get; set; }
-
-        [Parameter]
-        public Zone Area { get; set; }
-
-        [Parameter]
-        public string ClipId { get; set; }
-
-        [Parameter]
-        public Axis Axis { get; set; }
-
-        [Parameter]
-        public double Space { get; set; }
-
-        private Zone zone;
         private Zone zoneTitle;
 
-        protected override void OnInitialized()
+        protected override void OnParametersSet()
         {
-            base.OnInitialized();
+            base.OnParametersSet();
 
             zone.X = Area.X + Theme.Axis.Y switch
             {

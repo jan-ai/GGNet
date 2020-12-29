@@ -9,6 +9,8 @@ namespace GGNet.Components
     {
         protected RenderChildPolicyBase policy;
         protected RenderChildPolicyBase areaPolicy;
+        protected RenderChildPolicyBase axisXPolicy;
+        protected RenderChildPolicyBase axisYPolicy;
 
         protected Zone Area;
 
@@ -44,6 +46,8 @@ namespace GGNet.Components
 
             policy = Plot.Policy.Child();
             areaPolicy = Plot.Policy.Child();
+            axisXPolicy = Plot.Policy.Child();
+            axisYPolicy = Plot.Policy.Child();
 
             clip = Plot.Id + "-" + Data.Id;
         }
@@ -95,7 +99,11 @@ namespace GGNet.Components
             }
 
             if (!firstRender)
+            {
                 areaPolicy.Refresh();
+                axisXPolicy.Refresh();
+                axisYPolicy.Refresh();
+            }
         }
 
         public void Refresh() => policy.Refresh();

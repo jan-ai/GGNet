@@ -25,10 +25,10 @@
     switch (Data.Data.Coord)
     {
         case Cartesian cartesian:
-            <GGNet.Components.Labeling.CartesianXAxis ClipId=@clip Axis=@Data.xAxis Area=@Area Space=@XAxisSpace /> 
+            <GGNet.Components.Labeling.CartesianXAxis ClipId=@clip Axis=@Data.xAxis Area=@Area Space=@XAxisSpace RenderPolicy=@axisXPolicy /> 
             break;
         case Polar polar:
-            <GGNet.Components.Labeling.PolarXAxis ClipId=@clip Axis=@Data.xAxis Area=@Area Coord=@polar />
+            <GGNet.Components.Labeling.PolarXAxis ClipId=@clip Axis=@Data.xAxis Area=@Area Coord=@polar RenderPolicy=@axisXPolicy />
             break;
     }
 }
@@ -38,14 +38,14 @@
     switch (Data.Data.Coord)
     {
         case Cartesian cartesian:
-            <GGNet.Components.Labeling.CartesianYAxis ClipId=@clip Axis=@Data.yAxis Area=@Area Space=@YAxisSpace />
+            <GGNet.Components.Labeling.CartesianYAxis ClipId=@clip Axis=@Data.yAxis Area=@Area Space=@YAxisSpace RenderPolicy=@axisYPolicy />
            break;
         case Polar polar:
-            <GGNet.Components.Labeling.PolarYAxis ClipId=@clip Axis=@Data.yAxis Area=@Area Coord=@polar />
+            <GGNet.Components.Labeling.PolarYAxis ClipId=@clip Axis=@Data.yAxis Area=@Area Coord=@polar RenderPolicy=@axisYPolicy />
             break;
     }
 }
 
-<Area T=T TX=TX TY=TY Data=@Data Zone=@Area Clip=@(clip + "-area") RenderPolicy=@areaPolicy/>
+<Area T=T TX=TX TY=TY Data=@Data Zone=@Area Clip=@(clip + "-area") RenderPolicy=@areaPolicy />
 
 <GGNet.Components.Tooltips.Plot Id=@Plot.Id Coord=@Data.Data.Coord Area=@Area @ref=@tooltip />

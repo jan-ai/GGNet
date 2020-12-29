@@ -4,30 +4,14 @@ using Microsoft.AspNetCore.Components;
 
 namespace GGNet.Components.Labeling
 {
-    public partial class CartesianXAxis : ComponentBase
+    public partial class CartesianXAxis : AxisBase
     {
-        [CascadingParameter]
-        public Theme Theme { get; set; }
-
-        [Parameter]
-        public Zone Area { get; set; }
-
-        [Parameter]
-        public string ClipId { get; set; }
-
-        [Parameter]
-        public Axis Axis { get; set; }
-
-        [Parameter]
-        public double Space { get; set; }
-
-        private Zone zone;
         private Zone zoneTitle;
         private Zone zoneLabel;
 
-        protected override void OnInitialized()
+        protected override void OnParametersSet()
         {
-            base.OnInitialized();
+            base.OnParametersSet();
 
             zone.X = Area.X + Area.Width - Theme.Axis.Text.X.Margin.Right;
             zone.Y = Area.Y + Area.Height + Theme.Axis.Text.X.Margin.Top + Axis.Height;

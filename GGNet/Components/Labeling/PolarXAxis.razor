@@ -1,5 +1,7 @@
 ﻿@using System.Globalization
 
+@inherits AxisBase
+
 @foreach (var (value, label) in Axis.Labels)
 {
     if (value < 0 || value > 1)

@@ -5,28 +5,11 @@ using Microsoft.AspNetCore.Components;
 
 namespace GGNet.Components.Labeling
 {
-    public partial class PolarYAxis : ComponentBase
+    public partial class PolarYAxis : AxisBase
     {
-        [CascadingParameter]
-        public Theme Theme { get; set; }
-
-        [Parameter]
-        public ICoord Coord { get; set; }
-
-        [Parameter]
-        public Zone Area { get; set; }
-
-        [Parameter]
-        public string ClipId { get; set; }
-
-        [Parameter]
-        public Axis Axis { get; set; }
-
-        private Zone zone;
-
-        protected override void OnInitialized()
+        protected override void OnParametersSet()
         {
-            base.OnInitialized();
+            base.OnParametersSet();
 
             zone.X = Area.X + Theme.Axis.Y switch
             {

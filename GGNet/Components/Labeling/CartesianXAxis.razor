@@ -1,5 +1,7 @@
 ﻿@using System.Globalization
 
+@inherits AxisBase
+
 @foreach (var (value, label) in Axis.Labels)
 {
     if (value < 0 || value > 1)
@@ -24,8 +26,7 @@
     <g clip-path="url(#@ClipId)">
         <text x=@x.ToString(CultureInfo.InvariantCulture)
               y=@zoneTitle.Y.ToString(CultureInfo.InvariantCulture)
-              class="axisTitleX"
-              text-anchor="middle">@title</text>
+              class="axisTextX">@title</text>
     </g>
 }
 
