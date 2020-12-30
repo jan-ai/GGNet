@@ -379,12 +379,6 @@
         }
 
         {
-            var theme1 = Theme.Default(dark: false, legend: Position.Top);
-            //theme1.Panel.Grid.Major.Y.Width = 0;
-            theme1.Axis.Text.Y.Angle = -45;
-            theme1.Axis.Text.Y.Anchor = Anchor.middle;
-            //theme1.Axis.Text.Y.Margin.Top = 4;
-
             stack = Plot.New(Beatles.Load().OrderBy(o => o.Name), x: o => o.Year, o => o.N)
                 .Geom_Area(tooltip: o => $"{o.Name}: {o.Year}", alpha: 0.5, position: PositionAdjustment.Stack)
                 .Scale_X_Continuous(expand: (0, 3, 0, 0))
@@ -393,8 +387,7 @@
                 .Title("Popularity of Beatles Names")
                 .YLab("#")
                 .XLab("Year")
-                .Theme(theme1);
-                //.Theme(dark: false, legend: Position.Top);
+                .Theme(dark: false, legend: Position.Top);
         }
     }
 
