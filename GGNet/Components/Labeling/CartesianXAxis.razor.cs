@@ -14,7 +14,13 @@ namespace GGNet.Components.Labeling
             base.OnParametersSet();
 
             zone.X = Area.X + Area.Width - Theme.Axis.Text.X.Margin.Right;
-            zone.Y = Area.Y + Area.Height + Theme.Axis.Text.X.Margin.Top + Axis.Height;
+            zone.Y = Area.Y + Area.Height + Theme.Axis.Text.X.Margin.Top + Axis.Zone.Height * Theme.Axis.Text.X.Anchor switch
+            {
+                Anchor.start => 1,
+                Anchor.middle => Theme.Axis.Text.X.Angle != 0 ? 0.5 : 1,
+                _ => 0,
+            };
+
             zone.Width = Area.Width - Theme.Axis.Text.X.Margin.Left - Theme.Axis.Text.X.Margin.Right;
             zone.Height = Theme.Axis.Text.X.Margin.Top + Axis.AxisLabelSize + Theme.Axis.Text.X.Margin.Bottom;
 

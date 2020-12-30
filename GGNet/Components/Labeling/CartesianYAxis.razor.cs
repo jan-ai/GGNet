@@ -20,8 +20,15 @@ namespace GGNet.Components.Labeling
                 _ => throw new IndexOutOfRangeException(),
             };
 
+            zone.X -= Axis.Zone.Width * (Theme.Axis.Text.Y.Anchor switch
+            {
+                Anchor.start => 1,
+                Anchor.middle => 0.5,
+                _ => 0,
+            });
+
             zone.Y = Area.Y;
-            zone.Width = Axis.Width;
+            zone.Width = Axis.Zone.Width;
             zone.Height = Area.Height;
 
             if (Axis.AxisLabelSize > 0.0 || Axis.Titles.Any())
@@ -34,6 +41,13 @@ namespace GGNet.Components.Labeling
                 {
                     zoneTitle.X = Area.X + Area.Width + Axis.AxisLabelSize - Theme.Axis.Title.Y.Margin.Right;
                 }
+
+                zoneTitle.X -= Axis.AxisLabelSize * (Theme.Axis.Title.Y.Anchor switch
+                {
+                    Anchor.start => 1,
+                    Anchor.middle => 0.5,
+                    _ => 0,
+                });
 
                 zoneTitle.Y = Area.Y + Theme.Axis.Title.Y.Margin.Bottom;
                 zoneTitle.Width = Theme.Axis.Title.Y.Margin.Left + Axis.AxisLabelSize + Theme.Axis.Title.Y.Margin.Right;

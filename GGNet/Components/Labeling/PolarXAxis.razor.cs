@@ -13,7 +13,7 @@ namespace GGNet.Components.Labeling
 
             zone.X = Area.X + Area.Width / 2;
             zone.Y = Area.Y;
-            zone.Width = Axis.Width;
+            zone.Width = Axis.Zone.Width;
             zone.Height = Area.Height;
         }
     }

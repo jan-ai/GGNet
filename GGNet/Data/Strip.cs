@@ -28,13 +28,12 @@ namespace GGNet.Data
             if (string.IsNullOrEmpty(Label))
                 return false;
 
-            var width = Label.Width(textSettings.Size);
-            var height = Label.Height(textSettings.Size);
+            var labelZone = Label.Zone(textSettings);
 
-            Zone.X = zone.X + (_alignment == TextAlignment.BottomLeft ? margin.Left : zone.Width - margin.Right - width);
-            Zone.Y = zone.Y + margin.Top + (_alignment == TextAlignment.BottomLeft ? height : 0);
-            Zone.Width = margin.Left + width + margin.Right;
-            Zone.Height = margin.Top + height + margin.Bottom;
+            Zone.X = zone.X + (_alignment == TextAlignment.BottomLeft ? margin.Left : zone.Width - margin.Right - labelZone.Width);
+            Zone.Y = zone.Y + margin.Top + (_alignment == TextAlignment.BottomLeft ? labelZone.Height : 0);
+            Zone.Width = margin.Left + labelZone.Width + margin.Right;
+            Zone.Height = margin.Top + labelZone.Height + margin.Bottom;
 
             return true;
         }

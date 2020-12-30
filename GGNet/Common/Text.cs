@@ -1,9 +1,11 @@
-﻿namespace GGNet
+﻿using System;
+
+namespace GGNet
 {
     // Note width are font specific. Run pixelWidthCalculator.html
     public static class TextUtils
     {
-        public static double Width(this string text, Size size)
+        private static double Width(this string text, Size size)
         {
             if (string.IsNullOrEmpty(text))
             {
@@ -126,8 +128,24 @@
             return relative * width;
         }
 
+        private static double Height(this string text, Size size) => string.IsNullOrEmpty(text) ? 0 : size.Height();
+
         public static double Height(this Size size) => size.Value * (size.Units == Units.em ? 16 : 1);
 
-        public static double Height(this string text, Size size) => string.IsNullOrEmpty(text) ? 0 : size.Height();
+        public static Zone Zone(this string text, Elements.Text format)
+        {
+            var width = text.Width(format.Size);
+            var height = text.Height(format.Size);
+            
+            var angelInRadians = format.Angle * Math.PI / 180.0;
+            var sin = Math.Abs(Math.Sin(angelInRadians));
+            var cos = Math.Abs(Math.Cos(angelInRadians));
+
+            return new Zone
+            {
+                Width = width * cos + height * sin,
+                Height = width * sin + height * cos,
+            };
+        }
     }
 }

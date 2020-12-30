@@ -39,7 +39,11 @@
 </div>
 
 <div class="border rounded-lg m-5 p-1" style="width: 720px;">
-    <Plot Data=@weapon T=Weapon.Point TX=Double TY=Double />
+    <Plot Data=@weaponAxisTextRotated T=Weapon.Point TX=Double TY=Double />
+</div>
+
+<div class="border rounded-lg m-5 p-1" style="width: 720px;">
+    <Plot Data=@weaponFlipped T=Weapon.Point TX=Double TY=Double />
 </div>
 
 <div class="border rounded-lg m-5 p-1" style="width: 720px; background-color: #263238;">
@@ -70,7 +74,8 @@
     Data<Tip.Point, Tip.Day, double> tip;
     Data<GapMinder.Point, double, double> gapminder;
     Data<Beatles.Point, double, double> beatles;
-    Data<Weapon.Point, double, double> weapon;
+    Data<Weapon.Point, double, double> weaponFlipped;
+    Data<Weapon.Point, double, double> weaponAxisTextRotated;
     Data<Point2, double, double> log10;
     Data<Point2, double, double> sqrt;
 
@@ -285,7 +290,7 @@
             var theme = Theme.Default(dark: false);
             theme.Panel.Grid.Major.Y.Width = 0;
 
-            weapon = Plot.New(source, o => o.Id, o => o.Value)
+            weaponFlipped = Plot.New(source, o => o.Id, o => o.Value)
                 .Geom_Bar(tooltip: o => $"{o.Value}", fill: "#69b3a2", alpha: 0.7)
                 .Scale_X_Discrete(expand: (0.0, 0.1, 0, 0.1), formatter: labeller)
                 .Scale_Y_Continuous(expand: (0, 0, 0.05, 0.0))
@@ -293,6 +298,20 @@
                 .Coord_Flip()
                 .Caption("SIPRI trend-indicator value")
                 .Theme(theme);
+
+            var theme1 = Theme.Default(dark: false);
+            theme1.Panel.Grid.Major.Y.Width = 0;
+            theme1.Axis.Text.X.Angle = -45;
+            theme1.Axis.Text.X.Anchor = Anchor.middle;
+            theme1.Axis.Text.X.Margin.Top = 4;
+
+            weaponAxisTextRotated = Plot.New(source, o => o.Id, o => o.Value)
+                .Geom_Bar(tooltip: o => $"{o.Value}", fill: "#69b3a2", alpha: 0.7)
+                .Scale_X_Discrete(expand: (0.0, 0.1, 0, 0.1), formatter: labeller)
+                .Scale_Y_Continuous(expand: (0, 0, 0.05, 0.0))
+                .YLab("Weapon Quantity")
+                .Caption("SIPRI trend-indicator value")
+                .Theme(theme1);
         }
 
         {
@@ -360,6 +379,12 @@
         }
 
         {
+            var theme1 = Theme.Default(dark: false, legend: Position.Top);
+            //theme1.Panel.Grid.Major.Y.Width = 0;
+            theme1.Axis.Text.Y.Angle = -45;
+            theme1.Axis.Text.Y.Anchor = Anchor.middle;
+            //theme1.Axis.Text.Y.Margin.Top = 4;
+
             stack = Plot.New(Beatles.Load().OrderBy(o => o.Name), x: o => o.Year, o => o.N)
                 .Geom_Area(tooltip: o => $"{o.Name}: {o.Year}", alpha: 0.5, position: PositionAdjustment.Stack)
                 .Scale_X_Continuous(expand: (0, 3, 0, 0))
@@ -368,7 +393,8 @@
                 .Title("Popularity of Beatles Names")
                 .YLab("#")
                 .XLab("Year")
-                .Theme(dark: false, legend: Position.Top);
+                .Theme(theme1);
+                //.Theme(dark: false, legend: Position.Top);
         }
     }
 

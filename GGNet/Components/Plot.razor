@@ -345,7 +345,7 @@
 
                     if (panel.xAxis.Show)
                     {
-                        var h = Data.Theme.Axis.Text.X.Margin.Top + panel.xAxis.Height + Data.Theme.Axis.Text.X.Margin.Bottom;
+                        var h = Data.Theme.Axis.Text.X.Margin.Top + panel.xAxis.Zone.Height + Data.Theme.Axis.Text.X.Margin.Bottom;
 
                         if (panel.xAxis.TitlesVisibility)
                             h += Data.Theme.Axis.Title.X.Margin.Top + panel.xAxis.TitlesSize + Data.Theme.Axis.Title.X.Margin.Bottom;
@@ -354,7 +354,7 @@
                     }
 
                     if (panel.yAxis.Show)
-                        yAxisSpace[panel.Position.col] = Math.Max(yAxisSpace[panel.Position.col], panel.yAxis.Width + Data.Theme.Axis.Text.Y.Margin.Left + Data.Theme.Axis.Text.Y.Margin.Right);
+                        yAxisSpace[panel.Position.col] = Math.Max(yAxisSpace[panel.Position.col], panel.yAxis.Zone.Width + Data.Theme.Axis.Text.Y.Margin.Left + Data.Theme.Axis.Text.Y.Margin.Right);
                 }
 
                 var width = wrapper.Width - Data.Strip - (Data.Coord.PanelColumns(Data) - 1.0) * Theme.Panel.Spacing.X - yAxisSpace.Sum();

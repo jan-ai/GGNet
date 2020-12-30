@@ -141,8 +141,7 @@ namespace GGNet.Geoms
             var x = Positions.X.Map(item);
             var y = Positions.Y.Map(item);
 
-            var width = value.Width(Aesthetic.Size);
-            var height = value.Height(Aesthetic.Size);
+            var zone = value.Zone(Aesthetic);
 
             var aes = Aesthetic;
             if (clone)
@@ -157,8 +156,8 @@ namespace GGNet.Geoms
             {
                 X = x,
                 Y = y,
-                Width = width,
-                Height = height,
+                Width = zone.Width,
+                Height = zone.Height,
                 Value = value,
                 Aesthetic = aes
             };

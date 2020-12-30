@@ -16,11 +16,12 @@ namespace GGNet
 
             if (!string.IsNullOrEmpty(aes.Name))
             {
+                var zone = aes.Name.Zone(theme.Legend.Title);
                 Title = new Dimension<string>
                 {
                     Value = aes.Name,
-                    Width = aes.Name.Width(theme.Legend.Title.Size),
-                    Height = aes.Name.Height(theme.Legend.Title.Size)
+                    Width = zone.Width,
+                    Height = zone.Height
                 };
             }
 
@@ -93,16 +94,16 @@ namespace GGNet
                     }
                 }
 
-                var height = label.Height(theme.Legend.Labels.Size);
+                var zone = label.Zone(theme.Legend.Labels);
 
                 var item = (
                     label: new Dimension<string>
                     {
                         Value = label,
-                        Width = label.Width(theme.Legend.Labels.Size),
-                        Height = height
+                        Width = zone.Width,
+                        Height = zone.Height
                     },
-                    elements: new Elements(height)
+                    elements: new Elements(zone.Height)
                 );
 
                 Add(item);

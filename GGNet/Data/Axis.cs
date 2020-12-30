@@ -14,8 +14,7 @@ namespace GGNet.Data
 
         public IEnumerable<(double, string title)> Titles { get; set; } = Array.Empty<(double, string title)>();
 
-        public double Width { get; set; }
-        public double Height { get; set; }
+        public Zone Zone;
         public double TitlesSize { get; set; }
         
         public string AxisLabel { get; set; }

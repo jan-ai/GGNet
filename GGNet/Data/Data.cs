@@ -173,7 +173,7 @@ namespace GGNet
                         var lab = PanelFactories[i].YLab;
                         if (!string.IsNullOrEmpty(lab))
                         {
-                            ylab = lab.Height(Theme.Axis.Title.Y.Size);
+                            ylab = lab.Zone(Theme.Axis.Title.Y).Width;
 
                             break;
                         }
@@ -202,7 +202,7 @@ namespace GGNet
                             {
                                 var xAxis = Coord.XAxis(panel);
                                 xAxis.AxisLabel = XLab;
-                                xAxis.AxisLabelSize = XLab.Height(Theme.Axis.Title.X.Size);
+                                xAxis.AxisLabelSize = XLab.Zone(Theme.Axis.Title.X).Height;
                             }
                         }
 
@@ -228,14 +228,14 @@ namespace GGNet
                     {
                         var xAxis = Coord.XAxis(panel);
                         xAxis.AxisLabel = XLab;
-                        xAxis.AxisLabelSize =XLab.Height(Theme.Axis.Title.X.Size);
+                        xAxis.AxisLabelSize =XLab.Zone(Theme.Axis.Title.X).Height;
                     }
 
                     if (!string.IsNullOrEmpty(DefaultFactory.YLab))
                     {
                         var yAxis = Coord.YAxis(panel);
                         yAxis.AxisLabel = DefaultFactory.YLab;
-                        yAxis.AxisLabelSize = DefaultFactory.YLab.Height(Theme.Axis.Title.Y.Size);
+                        yAxis.AxisLabelSize = DefaultFactory.YLab.Zone(Theme.Axis.Title.Y).Width;
                     }
 
                     Panels.Add(panel);
@@ -299,13 +299,13 @@ namespace GGNet
             var xlab = 0.0;
             if (!string.IsNullOrEmpty(XLab))
             {
-                xlab = XLab.Height(Theme.Axis.Title.X.Size);
+                xlab = XLab.Zone(Theme.Axis.Title.X).Height;
             }
 
             var ylab = 0.0;
             if (!string.IsNullOrEmpty(DefaultFactory.YLab))
             {
-                ylab = DefaultFactory.YLab.Height(Theme.Axis.Title.Y.Size);
+                ylab = DefaultFactory.YLab.Zone(Theme.Axis.Title.Y).Width;
             }
 
             for (var i = 0; i < facets.Length; i++)

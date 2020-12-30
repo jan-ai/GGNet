@@ -13,8 +13,7 @@
         if (Area.Y < (y - height / 2.0) && (y + offset) < (Area.Y + Area.Height))
         {
             <g clip-path="url(#@ClipId)">
-                <text x=@zone.X.ToString(CultureInfo.InvariantCulture)
-                      y=@y.ToString(CultureInfo.InvariantCulture)
+                <text style="transform: translate(@zone.X.ToString(CultureInfo.InvariantCulture)px, @y.ToString(CultureInfo.InvariantCulture)px) rotate(@Theme.Axis.Text.Y.Angle.ToString(CultureInfo.InvariantCulture)deg);"
                       class="axisTextY">@label</text>
             </g>
         }

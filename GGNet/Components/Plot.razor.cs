@@ -41,13 +41,12 @@ namespace GGNet.Components
 
             if (!string.IsNullOrEmpty(Data.Title))
             {
-                var width = Data.Title.Width(Theme.Plot.Title.Size);
-                var height = Data.Title.Height(Theme.Plot.Title.Size);
+                var zone = Data.Title.Zone(Theme.Plot.Title);
 
                 Title.X = Theme.Plot.Title.Margin.Left;
-                Title.Y = Theme.Plot.Title.Margin.Top + height;
-                Title.Width = Theme.Plot.Title.Margin.Left + width + Theme.Plot.Title.Margin.Right;
-                Title.Height = Theme.Plot.Title.Margin.Top + height + Theme.Plot.Title.Margin.Bottom;
+                Title.Y = Theme.Plot.Title.Margin.Top + zone.Height;
+                Title.Width = Theme.Plot.Title.Margin.Left + zone.Width + Theme.Plot.Title.Margin.Right;
+                Title.Height = Theme.Plot.Title.Margin.Top + zone.Height + Theme.Plot.Title.Margin.Bottom;
 
                 wrapper.Y += Title.Height;
                 wrapper.Height -= Title.Height;
@@ -55,13 +54,12 @@ namespace GGNet.Components
 
             if (!string.IsNullOrEmpty(Data.SubTitle))
             {
-                var width = Data.SubTitle.Width(Theme.Plot.SubTitle.Size);
-                var height = Data.SubTitle.Height(Theme.Plot.SubTitle.Size);
+                var zone = Data.SubTitle.Zone(Theme.Plot.SubTitle);
 
                 SubTitle.X = Theme.Plot.SubTitle.Margin.Left;
-                SubTitle.Y = Title.Height + Theme.Plot.SubTitle.Margin.Top + height;
-                SubTitle.Width = Theme.Plot.SubTitle.Margin.Left + width + Theme.Plot.SubTitle.Margin.Right;
-                SubTitle.Height = Theme.Plot.SubTitle.Margin.Top + height + Theme.Plot.SubTitle.Margin.Bottom;
+                SubTitle.Y = Title.Height + Theme.Plot.SubTitle.Margin.Top + zone.Height;
+                SubTitle.Width = Theme.Plot.SubTitle.Margin.Left + zone.Width + Theme.Plot.SubTitle.Margin.Right;
+                SubTitle.Height = Theme.Plot.SubTitle.Margin.Top + zone.Height + Theme.Plot.SubTitle.Margin.Bottom;
 
                 wrapper.Y += SubTitle.Height;
                 wrapper.Height -= SubTitle.Height;
@@ -69,12 +67,11 @@ namespace GGNet.Components
 
             if (!string.IsNullOrEmpty(Data.Caption))
             {
-                var width = Data.Caption.Width(Theme.Plot.Caption.Size);
-                var height = Data.Caption.Height(Theme.Plot.Caption.Size);
+                var zone = Data.Caption.Zone(Theme.Plot.Caption);
 
                 Caption.Y = Height - Theme.Plot.Caption.Margin.Bottom;
-                Caption.Width = Theme.Plot.Caption.Margin.Left + width + Theme.Plot.Caption.Margin.Right;
-                Caption.Height = Theme.Plot.Caption.Margin.Top + height + Theme.Plot.Caption.Margin.Bottom;
+                Caption.Width = Theme.Plot.Caption.Margin.Left + zone.Width + Theme.Plot.Caption.Margin.Right;
+                Caption.Height = Theme.Plot.Caption.Margin.Top + zone.Height + Theme.Plot.Caption.Margin.Bottom;
 
                 wrapper.Height -= Caption.Height;
             }

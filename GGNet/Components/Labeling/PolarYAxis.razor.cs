@@ -19,7 +19,7 @@ namespace GGNet.Components.Labeling
             };
 
             zone.Y = Area.Y;
-            zone.Width = Axis.Width;
+            zone.Width = Axis.Zone.Width;
             zone.Height = Area.Height;
         }
     }

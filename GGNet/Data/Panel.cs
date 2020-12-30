@@ -101,28 +101,28 @@ namespace GGNet
                     _yAxis.Titles = Y.Titles.Select(t => (Y.Coord(t.value), t.title));
                 }
 
-                xAxis.Height = 0.0;
+                xAxis.Zone.Height = 0.0;
                 xAxis.TitlesSize = 0.0;
 
                 if (Data.grid)
                 {
                     foreach (var (_, label) in xAxis.Labels)
-                        xAxis.Height = Math.Max(xAxis.Height, label.Height(Data.Theme.Axis.Text.X.Size));
+                        xAxis.Zone.Height = Math.Max(xAxis.Zone.Height, label.Zone(Data.Theme.Axis.Text.X).Height);
 
                     foreach (var (_, title) in xAxis.Titles)
-                        xAxis.TitlesSize = Math.Max(xAxis.TitlesSize, title.Height(Data.Theme.Axis.Title.X.Size));
+                        xAxis.TitlesSize = Math.Max(xAxis.TitlesSize, title.Zone(Data.Theme.Axis.Title.X).Height);
                 }
 
-                yAxis.Width = 0.0;
+                yAxis.Zone.Width = 0.0;
                 yAxis.TitlesSize = 0.0;
 
                 if (Data.grid)
                 {
                     foreach (var (_, label) in yAxis.Labels)
-                        yAxis.Width = Math.Max(yAxis.Width, label.Width(Data.Theme.Axis.Text.Y.Size));
+                        yAxis.Zone.Width = Math.Max(yAxis.Zone.Width, label.Zone(Data.Theme.Axis.Text.Y).Width);
 
                     foreach (var (_, title) in yAxis.Titles)
-                        yAxis.TitlesSize = Math.Max(yAxis.TitlesSize, title.Height(Data.Theme.Axis.Title.Y.Size));
+                        yAxis.TitlesSize = Math.Max(yAxis.TitlesSize, title.Zone(Data.Theme.Axis.Title.Y).Height);
                 }
             }
         }

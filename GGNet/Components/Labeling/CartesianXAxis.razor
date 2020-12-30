@@ -10,8 +10,7 @@
     var x = Area.CoordX(value);
 
     <g clip-path="url(#@ClipId)">
-        <text x=@x.ToString(CultureInfo.InvariantCulture)
-              y=@zone.Y.ToString(CultureInfo.InvariantCulture)
+        <text style="transform: translate(@x.ToString(CultureInfo.InvariantCulture)px, @zone.Y.ToString(CultureInfo.InvariantCulture)px) rotate(@Theme.Axis.Text.X.Angle.ToString(CultureInfo.InvariantCulture)deg);"
               class="axisTextX">@label</text>
     </g>
 }
@@ -24,8 +23,7 @@
     var x = Area.CoordX(value);
 
     <g clip-path="url(#@ClipId)">
-        <text x=@x.ToString(CultureInfo.InvariantCulture)
-              y=@zoneTitle.Y.ToString(CultureInfo.InvariantCulture)
+        <text style="transform: translate(@x.ToString(CultureInfo.InvariantCulture)px, @zoneTitle.Y.ToString(CultureInfo.InvariantCulture)px) rotate(@Theme.Axis.Text.X.Angle.ToString(CultureInfo.InvariantCulture)deg);"
               class="axisTextX">@title</text>
     </g>
 }
