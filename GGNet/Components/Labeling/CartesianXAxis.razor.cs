@@ -14,13 +14,7 @@ namespace GGNet.Components.Labeling
             base.OnParametersSet();
 
             zone.X = Area.X + Area.Width - Theme.Axis.Text.X.Margin.Right;
-            zone.Y = Area.Y + Area.Height + Theme.Axis.Text.X.Margin.Top + Axis.Zone.Height * Theme.Axis.Text.X.Anchor switch
-            {
-                Anchor.start => 1,
-                Anchor.middle => Theme.Axis.Text.X.Angle != 0 ? 0.5 : 1,
-                _ => 0,
-            };
-
+            zone.Y = Area.Y + Area.Height + Theme.Axis.Text.X.Margin.Top + Axis.Zone.Height;
             zone.Width = Area.Width - Theme.Axis.Text.X.Margin.Left - Theme.Axis.Text.X.Margin.Right;
             zone.Height = Theme.Axis.Text.X.Margin.Top + Axis.AxisLabelSize + Theme.Axis.Text.X.Margin.Bottom;
 
@@ -33,6 +27,13 @@ namespace GGNet.Components.Labeling
             zoneLabel.Y = zone.Y + Theme.Axis.Text.X.Margin.Bottom + Axis.AxisLabelSize + Theme.Axis.Title.X.Margin.Top;
             zoneLabel.Width = Area.Width - Theme.Axis.Title.X.Margin.Left - Theme.Axis.Title.X.Margin.Right;
             zoneLabel.Height = Theme.Axis.Title.X.Margin.Top + Axis.AxisLabelSize + Theme.Axis.Title.X.Margin.Bottom;
+
+            zone.Y -= Axis.Zone.Height * Theme.Axis.Text.X.Anchor switch
+            {
+                Anchor.start => 0,
+                Anchor.middle => Theme.Axis.Text.X.Angle != 0 ? 0.5 : 0,
+                _ => 1,
+            };
 
             if (Axis.TitlesVisibility)
                 zoneLabel.Y += Theme.Axis.Title.X.Margin.Top + Axis.TitlesSize + Theme.Axis.Title.X.Margin.Bottom;
