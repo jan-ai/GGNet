@@ -26,7 +26,6 @@ namespace GGNet.Scales
 
     public class FillContinuous : Scale<double, string>
     {
-        private readonly string[] colors;
         private readonly int m;
         private readonly string format;
 
@@ -35,14 +34,16 @@ namespace GGNet.Scales
         public FillContinuous(
             string[] colors,
             int m = 5,
-            string format = "0.##")
-            : base()
+            string format = "0.##",
+            ITransformation<double> transformation = null)
+            : base(transformation)
         {
-            this.colors = colors;
+            this.Colors = colors;
             this.m = m;
             this.format = format;
         }
 
+        public string[] Colors { get; }
         public override Guide Guide => Guide.ColorBar;
 
         public override void Train(double key)
@@ -86,7 +87,37 @@ namespace GGNet.Scales
         {
             if (limits.max > limits.min)
             {
-                return colors[Max(Min((int)(((key - limits.min) / (limits.max - limits.min)) * (colors.Length - 1)), colors.Length - 1), 0)];
+                double transOffset, transRange;
+
+                if (transformation != null)
+                {
+                    transOffset = transformation.Apply(key - limits.min);
+                    transRange = transformation.Apply(limits.max - limits.min);
+                }
+                else
+                {
+                    transOffset = key - limits.min;
+                    transRange = limits.max - limits.min;
+                }
+
+                var offset = Max(Min(transOffset / transRange, 1), 0) * (Colors.Length - 1);
+                var lowOffset = (int) Floor(offset);
+                var highOffset = (int) Ceiling(offset);
+                var lowColor = Colors[lowOffset];
+                var highColor = Colors[highOffset];
+
+                var (lowRed, lowGreen, lowBlue) = ParseColor(lowColor);
+                var (highRed, highGreen, highBlue) = ParseColor(highColor);
+
+                if (highOffset == lowOffset)
+                    return $"#{lowRed:X2}{lowGreen:X2}{lowBlue:X2}";
+
+                var colorOffset = (offset - lowOffset) / (highOffset - lowOffset);
+                var red = (uint) (lowRed + ((double) highRed - lowRed) * colorOffset);
+                var green = (uint) (lowGreen + ((double) highGreen - lowGreen) * colorOffset);
+                var blue = (uint) (lowBlue + ((double) highBlue - lowBlue) * colorOffset);
+
+                return $"#{red:X2}{green:X2}{blue:X2}";
             }
             else
             {
@@ -98,82 +129,23 @@ namespace GGNet.Scales
         {
             limits = (0.0, 0.0);
         }
-    }
 
-    public class FillLog10 : Scale<double, string>
-    {
-        private readonly string[] colors;
-        private readonly int m;
-        private readonly string format;
-
-        protected (double min, double max) limits = (0.0, 0.0);
-
-        public FillLog10(
-            string[] colors,
-            int m = 5,
-            string format = "0.##")
-            : base()
+        private static (uint red, uint green, uint blue) ParseColor(string color)
         {
-            this.colors = colors;
-            this.m = m;
-            this.format = format;
-        }
-
-        public override Guide Guide => Guide.ColorBar;
-
-        public override void Train(double key)
-        {
-            if (limits.min == 0 && limits.max == 0)
+            if (color.StartsWith("#"))
             {
-                limits = (key, key);
+                return (uint.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.AllowHexSpecifier),
+                    uint.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.AllowHexSpecifier),
+                    uint.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.AllowHexSpecifier));
             }
-            else
+            else if (color.StartsWith("rgb"))
             {
-                limits = (Min(limits.min, key), Max(limits.max, key));
-            }
-        }
-
-        public override void Set(bool grid)
-        {
-            if (!grid)
-                return;
-
-            var extended = Wilkinson.extended(limits.min, limits.max, m, true);
-
-            if (extended == null)
-                return;
-
-            var labels = new (string value, string label)[extended.Length];
-            var breaks = new string[extended.Length];
-
-            for (var i = 0; i < extended.Length; i++)
-            {
-                var value = extended[extended.Length - i - 1];
-                var mapped = Map(value);
-
-                breaks[i] = mapped;
-                labels[i] = (mapped, value.ToString(format));
+                var colorParts = color.Split(new char[] { '(', ',', ')' });
+                if (colorParts.Length >= 4)
+                    return (uint.Parse(colorParts[1]), uint.Parse(colorParts[2]), uint.Parse(colorParts[3]));
             }
 
-            Breaks = breaks;
-            Labels = labels;
-        }
-
-        public override string Map(double key, bool ignoreLimits = false)
-        {
-            if (limits.max > limits.min)
-            {
-                return colors[Max(Min((int) ((Log10(key - limits.min) / Log10(limits.max - limits.min)) * (colors.Length - 1)), colors.Length - 1), 0)];
-            }
-            else
-            {
-                return string.Empty;
-            }
-        }
-
-        public override void Clear()
-        {
-            limits = (0.0, 0.0);
+            return (0, 0, 0);
         }
     }
 }

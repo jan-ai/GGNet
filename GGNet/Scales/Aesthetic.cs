@@ -23,8 +23,8 @@ namespace GGNet.Scales
 
     public class Aesthetic<T, TKey, TValue> : IAestheticMapping<T, TValue>
     {
-        private readonly Func<T, TKey> selector;
-        private readonly Scale<TKey, TValue> scale;
+        protected readonly Func<T, TKey> selector;
+        protected readonly Scale<TKey, TValue> scale;
 
         public Aesthetic(Func<T, TKey> selector, Scale<TKey, TValue> scale, bool guide, string name)
         {
@@ -47,5 +47,14 @@ namespace GGNet.Scales
 
         public IEnumerable<(TValue value, string label)> Labels => scale.Labels;
 
+    }
+
+    public class ColorBarAesthetic<T> : Aesthetic<T, double, string>
+    {
+        public ColorBarAesthetic(Func<T, double> selector, FillContinuous scale, bool guide, string name) : base (selector, scale, guide, name)
+        {
+        }
+
+        public string[] Colors => (scale as FillContinuous).Colors;
     }
 }

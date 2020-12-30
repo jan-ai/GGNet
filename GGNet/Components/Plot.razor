@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using GGNet.Scales
 
 @typeparam T
 @typeparam TX
@@ -18,16 +19,17 @@
                 var l = Data.Legends[i];
 
                 @if (l.Aes.Type != Guide.ColorBar)
-                {
                     continue;
-                }
 
-                var n = l.Items.Count;
+                var aes = l.Aes as ColorBarAesthetic<T>;
+
+                if (aes == null)
+                    continue;
+
+                var n = aes.Colors.Length;
 
                 @if (n < 2)
-                {
                     continue;
-                }
 
                 <linearGradient id="gradient-@(Id)-@i"
                                 x1="0%"
@@ -41,10 +43,9 @@
                         for (var j = 0; j < n; j++)
                         {
                             var offset = (j == n - 1 ? 100.0 : j * delta);
-                            var idx = (Theme.Legend.Direction == Direction.Vertical ? j : n - 1 - j);
+                            var idx = (Theme.Legend.Direction == Direction.Horizontal ? j : n - 1 - j);
                             <stop offset="@offset.ToString(CultureInfo.InvariantCulture)%"
-                                  stop-color=@l.Items[idx].elements[0].Value.Fill
-                                  stop-opacity=@l.Items[idx].elements[0].Value.Alpha.ToString(CultureInfo.InvariantCulture) />
+                                  stop-color=@aes.Colors[idx] />
                         }
                     }
 
@@ -166,6 +167,9 @@
                         for (int j = 0; j < l.Items.Count; j++)
                         {
                             var (label, _) = l.Items[j];
+                            if (string.IsNullOrEmpty(label.Value))
+                                continue;
+
                             var ypos = offset + j * 3.0 * l.Height + (j < l.Items.Count - 1 ? label.Height / (j == 0 ? 1.0 : 2.0) : 0);
 
                             <g clip-path="url(#@(Id)-legend)">
@@ -292,6 +296,9 @@
                         for (int j = 0; j < l.Items.Count; j++)
                         {
                             var (label, _) = l.Items[l.Items.Count - 1 - j];
+                            if (string.IsNullOrEmpty(label.Value))
+                                continue;
+
                             var xpos = offset + j * 3.0 * l.Width - (j > 0 ? label.Width / (j == l.Items.Count - 1 ? 1.0 : 2.0) : 0);
 
                             <g clip-path="url(#@(Id)-legend)">

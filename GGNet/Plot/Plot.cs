@@ -3066,7 +3066,7 @@ namespace GGNet
 
             data.Aesthetics.Scales.Add(scale);
 
-            data.Aesthetics.Fill = new Aesthetic<T, double, string>(selector, scale, guide, name);
+            data.Aesthetics.Fill = new ColorBarAesthetic<T>(selector, scale, guide, name);
 
             return data;
         }
@@ -3081,11 +3081,11 @@ namespace GGNet
             where TX : struct
             where TY : struct
         {
-            var scale = new FillLog10(palette, m, format);
+            var scale = new FillContinuous(palette, m, format, Transformations.Log10.Instance);
 
             data.Aesthetics.Scales.Add(scale);
 
-            data.Aesthetics.Fill = new Aesthetic<T, double, string>(selector, scale, guide, name);
+            data.Aesthetics.Fill = new ColorBarAesthetic<T>(selector, scale, guide, name);
 
             return data;
         }
