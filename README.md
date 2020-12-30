@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/github/license/BlazorExtensions/Storage.svg?longCache=true&style=flat-square)](https://github.com/pablofrommars/GGNet/blob/master/LICENSE.TXT)
-[![Package Version](https://img.shields.io/badge/nuget-v2.2.0-blue.svg?longCache=true&style=flat-square)](https://www.nuget.org/packages/Twins.Blazor.GGNet/2.2.0)
+[![Package Version](https://img.shields.io/badge/nuget-v2.3.0-blue.svg?longCache=true&style=flat-square)](https://www.nuget.org/packages/Twins.Blazor.GGNet/2.3.0)
 # GG.Net Data Visualization
 
 GG.Net lets Data Scientists and Developers create interactive and flexible charts for .NET and [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor) Web Apps.
@@ -23,6 +23,10 @@ Taking its inspiration from the highly popular [ggpplot2](https://ggplot2.tidyve
 ![](https://github.com/pablofrommars/GGNet.Site/blob/master/wwwroot/img/CFR.png) | ![](https://github.com/pablofrommars/GGNet.Site/blob/master/wwwroot/img/abline.png) | ![](https://github.com/pablofrommars/GGNet.Site/blob/master/wwwroot/img/bubblemap.png)
 
 ### Release Notes
+
+#### Version 2.3
+* Added: support of rotated labels on x- & y-axis in cartesian coordinates system
+* Fixed issuer #5: Guide.ColorBar (Scale_Fill_Continuous) was potentially showing misleading colors as guide on charts depending on the colors chosen and the breaks used (calculated) on the color scale
 
 #### Version 2.2
 * Added support for updateable limits and expand limits on refresh of chart via XLim/YLim and XExpandLim/YExpandLim
