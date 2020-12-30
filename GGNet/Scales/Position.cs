@@ -53,7 +53,8 @@ namespace GGNet.Scales
 
         public override void Set(bool grid)
         {
-            SetRange(_min.Value, _max.Value);
+            if (_min.HasValue && _max.HasValue)
+                SetRange(_min.Value, _max.Value);
         }
 
         public virtual double Coord(double value)
