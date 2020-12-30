@@ -7,7 +7,7 @@
     <Authors>Pablo Belin, Jan Hesse</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Title>GG.Net Data Visualization</Title>
-    <Description>GG.Net lets Data Scientists and Developers create interactive and flexible charts for Blazor Web Apps and .Net in C# and F#.</Description>
+    <Description>GG.Net lets Data Scientists and Developers create interactive and flexible charts for Blazor Web Apps and .Net in C# and F# without using any Javascript.</Description>
     <Summary>GG.Net lets Data Scientists and Developers create interactive and flexible charts for Blazor Web Apps and .Net in C# and F#</Summary>
     <PackageTags>Blazor;plotting;plot;plots;charting;chart;charts;sparkline;sparklines;visualization;ML.Net;csharp;fsharp</PackageTags>
     <RepositoryUrl>https://github.com/jan-ai/GGNet</RepositoryUrl>
@@ -16,7 +16,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Product>GGNet Data Visualization</Product>
     <RepositoryType>git</RepositoryType>
-    <Version>2.2.0</Version>
+    <Version>2.3.0</Version>
     <Company />
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <OutputType>Library</OutputType>
