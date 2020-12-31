@@ -23,11 +23,8 @@ namespace GGNet.Scales
 
         public override Guide Guide => Guide.None;
 
-        public override void Set(bool grid)
+        protected override void Labeling()
         {
-            if (!grid)
-                return;
-
             var breaks = new List<double>();
             var minor = new List<double>();
             var labels = new List<(double x, string label)>();
