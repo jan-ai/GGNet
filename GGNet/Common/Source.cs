@@ -14,5 +14,14 @@ namespace GGNet
         {
             Add(items);
         }
+
+        public void ReplaceItems (IEnumerable<T> items)
+        {
+            lock (dataLock)
+            {
+                Clear();
+                Add(items);
+            }
+        }
     }
 }

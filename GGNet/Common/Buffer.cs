@@ -17,6 +17,8 @@ namespace GGNet
         protected int page;
         protected int element;
 
+        protected object dataLock = new object();
+
         public BufferBase(int pageCapacity = 32, int pagesIncrement = 4, IComparer<T> comparer = null)
         {
             this.comparer = comparer ?? Comparer<T>.Default;
@@ -35,9 +37,21 @@ namespace GGNet
 
         public int Count => count;
 
-        protected T Get(int i) => pages[i / pageCapacity][i % pageCapacity];
+        protected T Get(int i)
+        {
+            lock (dataLock)
+            {
+                return pages[i / pageCapacity][i % pageCapacity];
+            }
+        }
 
-        protected void Set(int i, T item) => pages[i / pageCapacity][i % pageCapacity] = item;
+        protected void Set(int i, T item)
+        {
+            lock (dataLock)
+            {
+                pages[i / pageCapacity][i % pageCapacity] = item;
+            }
+        }
 
         public T this[int i]
         {
@@ -49,45 +63,57 @@ namespace GGNet
 
         public void Add(IEnumerable<T> items)
         {
-            foreach (var item in items)
+            lock (dataLock)
             {
-                Add(item);
+                foreach (var item in items)
+                {
+                    Add(item);
+                }
             }
         }
 
         protected void Grow()
         {
-            count++;
-
-            if (element == pageCapacity)
+            lock (dataLock)
             {
-                page++;
+                count++;
 
-                if (page == pagesCapacity)
+                if (element == pageCapacity)
                 {
-                    pagesCapacity += pagesIncrement;
-                    Array.Resize(ref pages, pagesCapacity);
+                    page++;
+
+                    if (page == pagesCapacity)
+                    {
+                        pagesCapacity += pagesIncrement;
+                        Array.Resize(ref pages, pagesCapacity);
+                    }
+
+                    pages[page] ??= new T[pageCapacity];
+
+                    element = 0;
                 }
-
-                pages[page] ??= new T[pageCapacity];
-
-                element = 0;
             }
         }
 
         protected void Append(T item)
         {
-            Grow();
-            pages[page][element++] = item;
+            lock (dataLock)
+            {
+                Grow();
+                pages[page][element++] = item;
+            }
         }
 
         public abstract int IndexOf(T item);
 
         public void Clear()
         {
-            count = 0;
-            page = 0;
-            element = 0;
+            lock (dataLock)
+            {
+                count = 0;
+                page = 0;
+                element = 0;
+            }
         }
     }
 
@@ -102,9 +128,12 @@ namespace GGNet
 
         public void Add(Buffer<T> buffer)
         {
-            for (var i = 0; i < buffer.Count; i++)
+            lock (dataLock)
             {
-                Add(buffer[i]);
+                for (var i = 0; i < buffer.Count; i++)
+                {
+                    Add(buffer[i]);
+                }
             }
         }
 
@@ -112,16 +141,19 @@ namespace GGNet
         {
             var i = 0;
 
-            for (var p = 0; p < page; p++)
+            lock (dataLock)
             {
-                for (var j = 0; j < pageCapacity; j++)
+                for (var p = 0; p < page; p++)
                 {
-                    if (comparer.Compare(pages[p][j], item) == 0)
+                    for (var j = 0; j < pageCapacity; j++)
                     {
-                        return i;
-                    }
+                        if (comparer.Compare(pages[p][j], item) == 0)
+                        {
+                            return i;
+                        }
 
-                    i++;
+                        i++;
+                    }
                 }
             }
 
@@ -138,73 +170,76 @@ namespace GGNet
 
         public override void Add(T item)
         {
-            if (Count == 0)
+            lock (dataLock)
             {
-                Append(item);
-                return;
-            }
-
-            var cmp = comparer.Compare(pages[page][element - 1], item);
-            if (cmp == 0)
-            {
-                return;
-            }
-            else if (cmp < 0)
-            {
-                Append(item);
-                return;
-            }
-
-            var found = false;
-            var p = 0;
-            var i = 0;
-
-            while (p <= page)
-            {
-                i = 0;
-
-                while (i < pageCapacity)
+                if (Count == 0)
                 {
-                    cmp = comparer.Compare(item, pages[p][i]);
-                    if (cmp == 0)
+                    Append(item);
+                    return;
+                }
+
+                var cmp = comparer.Compare(pages[page][element - 1], item);
+                if (cmp == 0)
+                {
+                    return;
+                }
+                else if (cmp < 0)
+                {
+                    Append(item);
+                    return;
+                }
+
+                var found = false;
+                var p = 0;
+                var i = 0;
+
+                while (p <= page)
+                {
+                    i = 0;
+
+                    while (i < pageCapacity)
                     {
-                        return;
+                        cmp = comparer.Compare(item, pages[p][i]);
+                        if (cmp == 0)
+                        {
+                            return;
+                        }
+                        if (cmp < 0)
+                        {
+                            found = true;
+                            break;
+                        }
+
+                        i++;
                     }
-                    if (cmp < 0)
+
+                    if (found)
                     {
-                        found = true;
                         break;
                     }
 
-                    i++;
+                    p++;
                 }
 
-                if (found)
+                Grow();
+
+                while (p <= page)
                 {
-                    break;
+                    while (i < pageCapacity)
+                    {
+                        var tmp = pages[p][i];
+                        pages[p][i] = item;
+                        item = tmp;
+
+                        i++;
+                    }
+
+                    i = 0;
+                    p++;
                 }
 
-                p++;
+                element++;
             }
-
-            Grow();
-
-            while (p <= page)
-            {
-                while (i < pageCapacity)
-                {
-                    var tmp = pages[p][i];
-                    pages[p][i] = item;
-                    item = tmp;
-
-                    i++;
-                }
-
-                i = 0;
-                p++;
-            }
-
-            element++;
         }
 
         public override int IndexOf(T item)
@@ -212,37 +247,40 @@ namespace GGNet
             var start = 0;
             var n = Count;
 
-            while (n > 0)
+            lock (dataLock)
             {
-                var m = start + (n - 1) / 2;
-                var mvalue = this[m];
-
-                var cmp = comparer.Compare(item, mvalue);
-                if (cmp == 0)
+                while (n > 0)
                 {
-                    return m;
-                }
-                else if (cmp > 0)
-                {
-                    start = m + 1;
-                }
+                    var m = start + (n - 1) / 2;
+                    var mvalue = this[m];
 
-                n /= 2;
-            }
+                    var cmp = comparer.Compare(item, mvalue);
+                    if (cmp == 0)
+                    {
+                        return m;
+                    }
+                    else if (cmp > 0)
+                    {
+                        start = m + 1;
+                    }
 
-            if (element == pageCapacity)
-            {
-                page++;
-
-                if (page == pagesCapacity)
-                {
-                    pagesCapacity += pagesIncrement;
-                    Array.Resize(ref pages, pagesCapacity);
+                    n /= 2;
                 }
 
-                pages[page] ??= new T[pageCapacity];
+                if (element == pageCapacity)
+                {
+                    page++;
 
-                element = 0;
+                    if (page == pagesCapacity)
+                    {
+                        pagesCapacity += pagesIncrement;
+                        Array.Resize(ref pages, pagesCapacity);
+                    }
+
+                    pages[page] ??= new T[pageCapacity];
+
+                    element = 0;
+                }
             }
 
             return -1;
