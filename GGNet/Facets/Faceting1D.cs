@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GGNet.Facets
 {
@@ -7,17 +8,22 @@ namespace GGNet.Facets
         private readonly SortedBuffer<TKey> buffer = new SortedBuffer<TKey>(8, 1);
 
         private readonly Func<T, TKey> selector;
+        private readonly IEnumerable<TKey> predefinedFacets;
 
         private readonly int? nrows;
         private readonly int? ncolumns;
 
-        public Faceting1D(Func<T, TKey> selector, bool freeX, bool freeY, int? nrows, int? ncolumns)
+        public Faceting1D(Func<T, TKey> selector, bool freeX, bool freeY, int? nrows, int? ncolumns, IEnumerable<TKey> predefinedFacets = null)
             : base(freeX, freeY)
         {
             this.selector = selector;
 
             this.nrows = nrows;
             this.ncolumns = ncolumns;
+
+            this.predefinedFacets = predefinedFacets;
+            if (predefinedFacets != null)
+                buffer.Add(predefinedFacets);
         }
 
         public override bool Strip => false;
@@ -41,7 +47,12 @@ namespace GGNet.Facets
             return ((int)((double)n / NColumns), n % NColumns);
         }
 
-        public override void Clear() => buffer.Clear();
+        public override void Clear()
+        {
+            buffer.Clear();
+            if (predefinedFacets != null)
+                buffer.Add(predefinedFacets);
+        }
 
         public override Facet<T>[] Facets()
         {

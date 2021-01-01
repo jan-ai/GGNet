@@ -3187,20 +3187,24 @@ namespace GGNet
             return data;
         }
 
-        public static Data<T, TX, TY> Facet_Wrap<T, TX, TY, TKey>(this Data<T, TX, TY> data, Func<T, TKey> selector, bool freeX = false, bool freeY = false, int? nrows = null, int? ncolumns = null)
+        public static Data<T, TX, TY> Facet_Wrap<T, TX, TY, TKey>(this Data<T, TX, TY> data, Func<T, TKey> selector, 
+            bool freeX = false, bool freeY = false, int? nrows = null, int? ncolumns = null,
+            IEnumerable<TKey> predefinedFacets = null)
             where TX : struct
             where TY : struct
         {
-            data.Faceting = new Faceting1D<T, TKey>(selector, freeX, freeY, nrows, ncolumns);
+            data.Faceting = new Faceting1D<T, TKey>(selector, freeX, freeY, nrows, ncolumns, predefinedFacets);
 
             return data;
         }
 
-        public static Data<T, TX, TY> Facet_Grid<T, TX, TY, TRow, TColumn>(this Data<T, TX, TY> data, Func<T, TRow> row, Func<T, TColumn> column, bool freeX = false, bool freeY = false)
+        public static Data<T, TX, TY> Facet_Grid<T, TX, TY, TRow, TColumn>(this Data<T, TX, TY> data, Func<T, TRow> row, 
+            Func<T, TColumn> column, bool freeX = false, bool freeY = false,
+            IEnumerable<TRow> predefiniedRows = null, IEnumerable<TColumn> predefiniedColumns = null)
             where TX : struct
             where TY : struct
         {
-            data.Faceting = new Faceting2D<T, TRow, TColumn>(row, column, freeX, freeY);
+            data.Faceting = new Faceting2D<T, TRow, TColumn>(row, column, freeX, freeY, predefiniedRows, predefiniedColumns);
 
             return data;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GGNet.Facets
 {
@@ -7,14 +8,26 @@ namespace GGNet.Facets
         private readonly SortedBuffer<TRow> rows = new SortedBuffer<TRow>(4, 1);
         private readonly SortedBuffer<TColumn> columns = new SortedBuffer<TColumn>(4, 1);
 
+        private readonly IEnumerable<TRow> predefiniedRows;
+        private readonly IEnumerable<TColumn> predefiniedColumns;
+
         private readonly Func<T, TRow> row;
         private readonly Func<T, TColumn> column;
 
-        public Faceting2D(Func<T, TRow> row, Func<T, TColumn> column, bool freeX, bool freeY)
+        public Faceting2D(Func<T, TRow> row, Func<T, TColumn> column, bool freeX, bool freeY,
+            IEnumerable<TRow> predefiniedRows = null, IEnumerable<TColumn> predefiniedColumns = null)
             : base(freeX, freeY)
         {
             this.row = row;
             this.column = column;
+
+            this.predefiniedRows = predefiniedRows;
+            if (predefiniedRows != null)
+                rows.Add(predefiniedRows);
+
+            this.predefiniedColumns = predefiniedColumns;
+            if (predefiniedColumns != null)
+                columns.Add(predefiniedColumns);
         }
 
         public override bool Strip => true;
@@ -44,7 +57,12 @@ namespace GGNet.Facets
         public override void Clear()
         {
             rows.Clear();
+            if (predefiniedRows != null)
+                rows.Add(predefiniedRows);
+
             columns.Clear();
+            if (predefiniedColumns != null)
+                columns.Add(predefiniedColumns);
         }
 
         public override Facet<T>[] Facets()
