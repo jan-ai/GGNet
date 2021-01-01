@@ -87,17 +87,6 @@ namespace GGNet.Components
                 }
             }
 
-            if (Data.xAxis.Show)
-            {
-                var xTitlesHeight = Data.xAxis.AxisLabelSize;
-
-                if (xTitlesHeight > 0.0)
-                    Area.Height -= Theme.Axis.Title.X.Margin.Top + xTitlesHeight + Theme.Axis.Title.X.Margin.Bottom;
-
-                if (Data.xAxis.Titles.Any())
-                    Area.Height -= Theme.Axis.Title.X.Margin.Top + xTitlesHeight + Theme.Axis.Title.X.Margin.Bottom;
-            }
-
             if (!firstRender)
             {
                 areaPolicy.Refresh();

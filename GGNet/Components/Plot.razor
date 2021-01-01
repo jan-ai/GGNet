@@ -352,22 +352,25 @@
 
                     if (panel.xAxis.Show)
                     {
-                        var h = Data.Theme.Axis.Text.X.Margin.Top + panel.xAxis.Zone.Height + Data.Theme.Axis.Text.X.Margin.Bottom;
+                        var h = Theme.Axis.Text.X.Margin.Top + panel.xAxis.Zone.Height + Theme.Axis.Text.X.Margin.Bottom;
 
                         if (panel.xAxis.TitlesVisibility)
-                            h += Data.Theme.Axis.Title.X.Margin.Top + panel.xAxis.TitlesSize + Data.Theme.Axis.Title.X.Margin.Bottom;
+                            h += Theme.Axis.Title.X.Margin.Top + panel.xAxis.TitlesSize + Theme.Axis.Title.X.Margin.Bottom;
+
+                        if (panel.xAxis.AxisLabelSize > 0.0)
+                            h += Theme.Axis.Title.X.Margin.Top + panel.xAxis.AxisLabelSize + Theme.Axis.Title.X.Margin.Bottom;
 
                         xAxisSpace[panel.Position.row] = Math.Max(xAxisSpace[panel.Position.row], h);
                     }
 
                     if (panel.yAxis.Show)
-                        yAxisSpace[panel.Position.col] = Math.Max(yAxisSpace[panel.Position.col], panel.yAxis.Zone.Width + Data.Theme.Axis.Text.Y.Margin.Left + Data.Theme.Axis.Text.Y.Margin.Right);
+                        yAxisSpace[panel.Position.col] = Math.Max(yAxisSpace[panel.Position.col], panel.yAxis.Zone.Width + Theme.Axis.Text.Y.Margin.Left + Theme.Axis.Text.Y.Margin.Right);
                 }
 
                 var width = wrapper.Width - Data.Strip - (Data.Coord.PanelColumns(Data) - 1.0) * Theme.Panel.Spacing.X - yAxisSpace.Sum();
                 var height = wrapper.Height - Data.Strip - (Data.Coord.PanelRows(Data) - 1.0) * Theme.Panel.Spacing.Y - xAxisSpace.Sum();
 
-                if (!Data.Panels[^1].xAxis.TitlesVisibility && !string.IsNullOrEmpty(Data.XLab))
+                if (Data.Panels.Count > 0 && !Data.Panels[^1].xAxis.TitlesVisibility && !string.IsNullOrEmpty(Data.XLab))
                 {
                     height -= Data.Panels[^1].xAxis.TitlesSize;
                 }
@@ -424,10 +427,11 @@
                         Height = h + xAxisSpace[panel.Position.row]
                     };
 
-                    <Panel Data=@panel
-                           Zone=@zone
-                           XAxisSpace=@xAxisSpace[panel.Position.row]
-                           YAxisSpace=@yAxisSpace[panel.Position.col]
+                    <Panel @key=panel
+                           Data=panel
+                           Zone=zone
+                           XAxisSpace=xAxisSpace[panel.Position.row]
+                           YAxisSpace=yAxisSpace[panel.Position.col]
                            T=T TX=TX TY=TY />
                 }
             }
