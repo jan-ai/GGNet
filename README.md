@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/github/license/BlazorExtensions/Storage.svg?longCache=true&style=flat-square)](https://github.com/pablofrommars/GGNet/blob/master/LICENSE.TXT)
-[![Package Version](https://img.shields.io/badge/nuget-v2.3.0-blue.svg?longCache=true&style=flat-square)](https://www.nuget.org/packages/Twins.Blazor.GGNet/2.3.0)
+[![Package Version](https://img.shields.io/badge/nuget-v2.3.1-blue.svg?longCache=true&style=flat-square)](https://www.nuget.org/packages/Twins.Blazor.GGNet/2.3.1)
 # GG.Net Data Visualization
 
 GG.Net lets Data Scientists and Developers create interactive and flexible charts for .NET and [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor) Web Apps.
@@ -23,6 +23,13 @@ Taking its inspiration from the highly popular [ggpplot2](https://ggplot2.tidyve
 ![](https://github.com/pablofrommars/GGNet.Site/blob/master/wwwroot/img/CFR.png) | ![](https://github.com/pablofrommars/GGNet.Site/blob/master/wwwroot/img/abline.png) | ![](https://github.com/pablofrommars/GGNet.Site/blob/master/wwwroot/img/bubblemap.png)
 
 ### Release Notes
+
+#### Version 2.3.1
+* Added support for predefinied facets, which will be shown always even no data is available for (some of) those predefinied facets
+* Added thread-safe ReplaceItems function to Sources for updating data on real-time applications
+* Improved calculations of size of facets to make sure all facets have the same size (independently on axis information)
+* Fixed a NullReferenceException if Refresh on plot was called, but no component was set
+* Fixed a NullReferenceException when ncolumns (but no nrows) was set on Facet_Wrap
 
 #### Version 2.3
 * Added: support of rotated labels on x- & y-axis in cartesian coordinates system
