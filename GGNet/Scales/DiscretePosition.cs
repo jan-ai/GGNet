@@ -36,7 +36,7 @@ namespace GGNet.Scales
             }
         }
 
-        protected virtual void Labeling()
+        protected override void Labeling()
         {
             var breaks = new double[values.Count];
             var labels = new (double value, string label)[values.Count];
@@ -49,14 +49,6 @@ namespace GGNet.Scales
 
             Breaks = breaks;
             Labels = labels;
-        }
-
-        public override void Set(bool grid)
-        {
-            base.Set(grid);
-            
-            if (grid)
-                Labeling();
         }
 
         public override double Map(T key, bool ignoreLimits = false)

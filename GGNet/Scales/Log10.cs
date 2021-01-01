@@ -23,13 +23,8 @@ namespace GGNet.Scales
 
         public override Guide Guide => Guide.None;
 
-        public override void Set(bool grid)
+        protected override void Labeling()
         {
-            base.Set(grid);
-
-            if (!grid)
-                return;
-
             var breaks = Log10Utils.Breaks(Range.min, Range.max);
             if (breaks.Length > 0)
             {

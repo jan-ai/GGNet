@@ -51,10 +51,15 @@ namespace GGNet.Scales
             );
         }
 
+        protected abstract void Labeling();
+
         public override void Set(bool grid)
         {
             if (_min.HasValue && _max.HasValue)
                 SetRange(_min.Value, _max.Value);
+
+            if (grid)
+                Labeling();
         }
 
         public virtual double Coord(double value)

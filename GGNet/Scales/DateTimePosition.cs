@@ -17,13 +17,8 @@ namespace GGNet.Scales
 
         public override Guide Guide => Guide.None;
 
-        public override void Set(bool grid)
+        protected override void Labeling()
         {
-            base.Set(grid);
-
-            if (!grid)
-                return;
-
             var labels = new List<(double x, string label)>();
             var titles = new List<(double x, string title)>();
             var breaks = new List<double>();

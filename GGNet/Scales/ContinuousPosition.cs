@@ -42,8 +42,12 @@ namespace GGNet.Scales
                     max = max.HasValue ? Math.Max(expand, max.Value) : expand;
                 }
             }
+
             if (min.HasValue && max.HasValue)
                 SetRange(min.Value, max.Value);
+
+            if (grid)
+                Labeling();
         }
     }
 }
