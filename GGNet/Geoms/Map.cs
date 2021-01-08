@@ -135,13 +135,7 @@ namespace GGNet.Geoms
             var fill = Aesthetic.Fill;
 
             if (Aesthetics.Fill != null)
-            {
                 fill = Aesthetics.Fill.Map(item);
-                if (string.IsNullOrEmpty(fill))
-                {
-                    return;
-                }
-            }
 
             var polygons = Selectors.Polygons(item);
 

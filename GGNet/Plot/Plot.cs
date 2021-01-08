@@ -3058,11 +3058,12 @@ namespace GGNet
             int m = 5,
             string format = "0.##",
             bool guide = true,
-            string name = null)
+            string name = null,
+            ITransformation<double> transformation = null)
             where TX : struct
             where TY : struct
         {
-            var scale = new FillContinuous(palette, m, format);
+            var scale = new FillContinuous(palette, m, format, transformation);
 
             data.Aesthetics.Scales.Add(scale);
 

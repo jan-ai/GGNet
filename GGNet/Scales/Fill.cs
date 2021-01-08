@@ -1,4 +1,6 @@
-﻿using GGNet.Transformations;
+﻿using System;
+using System.Collections.Generic;
+using GGNet.Transformations;
 
 using static System.Math;
 
@@ -45,9 +47,13 @@ namespace GGNet.Scales
 
         public string[] Colors { get; }
         public override Guide Guide => Guide.ColorBar;
+        public IEnumerable<(double offset, string color)> ColorGuide { get; set; } = Array.Empty<(double offset, string color)>();
 
         public override void Train(double key)
         {
+            if (double.IsNaN(key))
+                return;
+
             if (limits.min == 0 && limits.max == 0)
             {
                 limits = (key, key);
@@ -81,26 +87,34 @@ namespace GGNet.Scales
 
             Breaks = breaks;
             Labels = labels;
+
+            var colorGuide = new (double offset, string color)[Colors.Length];
+            for (int i = 0; i < Colors.Length; i++)
+            {
+                var min = transformation?.Apply(limits.min) ?? limits.min;
+                var max = transformation?.Apply(limits.max) ?? limits.max;
+                var key = min + ((double) i) / (Colors.Length - 1) * (max - min);
+                key = transformation?.Inverse(key) ?? key;
+                var offset = Max(Min((key - limits.min) / (limits.max - limits.min), 1), 0);
+
+                colorGuide[i] = (offset, Colors[i]);
+            }
+
+            ColorGuide = colorGuide;
         }
 
         public override string Map(double key, bool ignoreLimits = false)
         {
+            if (double.IsNaN(key))
+                return "none";
+
             if (limits.max > limits.min)
             {
-                double transOffset, transRange;
+                key = transformation?.Apply(key) ?? key;
+                var min = transformation?.Apply(limits.min) ?? limits.min;
+                var max = transformation?.Apply(limits.max) ?? limits.max;
 
-                if (transformation != null)
-                {
-                    transOffset = transformation.Apply(key - limits.min);
-                    transRange = transformation.Apply(limits.max - limits.min);
-                }
-                else
-                {
-                    transOffset = key - limits.min;
-                    transRange = limits.max - limits.min;
-                }
-
-                var offset = Max(Min(transOffset / transRange, 1), 0) * (Colors.Length - 1);
+                var offset = Max(Min((key - min) / (max - min), 1), 0) * (Colors.Length - 1);
                 var lowOffset = (int) Floor(offset);
                 var highOffset = (int) Ceiling(offset);
                 var lowColor = Colors[lowOffset];
@@ -121,7 +135,7 @@ namespace GGNet.Scales
             }
             else
             {
-                return string.Empty;
+                return Colors[0];
             }
         }
 

@@ -55,6 +55,6 @@ namespace GGNet.Scales
         {
         }
 
-        public string[] Colors => (scale as FillContinuous).Colors;
+        public IEnumerable<(double offset, string color)> ColorGuide => (scale as FillContinuous).ColorGuide;
     }
 }
