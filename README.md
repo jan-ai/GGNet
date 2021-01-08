@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/github/license/BlazorExtensions/Storage.svg?longCache=true&style=flat-square)](https://github.com/pablofrommars/GGNet/blob/master/LICENSE.TXT)
-[![Package Version](https://img.shields.io/badge/nuget-v2.3.1-blue.svg?longCache=true&style=flat-square)](https://www.nuget.org/packages/Twins.Blazor.GGNet/2.3.1)
+[![Package Version](https://img.shields.io/badge/nuget-v2.3.2-blue.svg?longCache=true&style=flat-square)](https://www.nuget.org/packages/Twins.Blazor.GGNet/2.3.2)
 # GG.Net Data Visualization
 
 GG.Net lets Data Scientists and Developers create interactive and flexible charts for .NET and [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor) Web Apps.
@@ -23,6 +23,13 @@ Taking its inspiration from the highly popular [ggpplot2](https://ggplot2.tidyve
 ![](https://github.com/pablofrommars/GGNet.Site/blob/master/wwwroot/img/CFR.png) | ![](https://github.com/pablofrommars/GGNet.Site/blob/master/wwwroot/img/abline.png) | ![](https://github.com/pablofrommars/GGNet.Site/blob/master/wwwroot/img/bubblemap.png)
 
 ### Release Notes
+
+#### Version 2.3.2
+* Added new ITransformation class applying max and min limits on values
+* better browser support for arcs, as some browser do not support 360 degree arcs (that might be used on pie/donut charts)
+* fixed NullReferenceException on linq enumeration when plot was refresh
+* fixed color guide in case a transformation function is applied to the data
+* fixed typing error
 
 #### Version 2.3.1
 * Added support for predefinied facets, which will be shown always even no data is available for (some of) those predefinied facets
