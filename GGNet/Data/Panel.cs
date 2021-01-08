@@ -85,20 +85,20 @@ namespace GGNet
                 {
                     var _xAxis = Data.Coord.XAxis(this);
 
-                    _xAxis.Breaks = X.Breaks.Select(b => X.Coord(b));
-                    _xAxis.MinorBreaks = X.MinorBreaks.Select(b => X.Coord(b));
-                    _xAxis.Labels = X.Labels.Select(l => (X.Coord(l.value), l.label));
-                    _xAxis.Titles = X.Titles.Select(t => (X.Coord(t.value), t.title));
+                    _xAxis.Breaks = X.Breaks.Select(b => X.Coord(b)).ToArray();
+                    _xAxis.MinorBreaks = X.MinorBreaks.Select(b => X.Coord(b)).ToArray();
+                    _xAxis.Labels = X.Labels.Select(l => (X.Coord(l.value), l.label)).ToArray();
+                    _xAxis.Titles = X.Titles.Select(t => (X.Coord(t.value), t.title)).ToArray();
                 }
 
                 if (Y != null)
                 {
                     var _yAxis = Data.Coord.YAxis(this);
 
-                    _yAxis.Breaks = Y.Breaks.Select(b => Y.Coord(b));
-                    _yAxis.MinorBreaks = Y.MinorBreaks.Select(b => Y.Coord(b));
-                    _yAxis.Labels = Y.Labels.Select(l => (Y.Coord(l.value), l.label));
-                    _yAxis.Titles = Y.Titles.Select(t => (Y.Coord(t.value), t.title));
+                    _yAxis.Breaks = Y.Breaks.Select(b => Y.Coord(b)).ToArray();
+                    _yAxis.MinorBreaks = Y.MinorBreaks.Select(b => Y.Coord(b)).ToArray();
+                    _yAxis.Labels = Y.Labels.Select(l => (Y.Coord(l.value), l.label)).ToArray();
+                    _yAxis.Titles = Y.Titles.Select(t => (Y.Coord(t.value), t.title)).ToArray();
                 }
 
                 xAxis.Zone.Height = 0.0;
