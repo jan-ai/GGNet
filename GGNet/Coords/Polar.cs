@@ -153,13 +153,39 @@ namespace GGNet.Coords
                     var point = PolarToCartesian(zone, outerRadius, startAngle);
                     curve.Points.Add(new Polycurve.Arc(point.x, point.y));
 
-                    point = PolarToCartesian(zone, outerRadius, endAngle);
-                    curve.Points.Add(new Polycurve.Arc(point.x, point.y, outerRadius, startAngle, endAngle));
+                    var isCircle = Math.Abs(endAngle - startAngle) == 360;
+                    if (isCircle)
+                    {
+                        var middleAngle = startAngle + (endAngle - startAngle) / 2;
+
+                        point = PolarToCartesian(zone, outerRadius, middleAngle);
+                        curve.Points.Add(new Polycurve.Arc(point.x, point.y, outerRadius, startAngle, middleAngle));
+
+                        point = PolarToCartesian(zone, outerRadius, endAngle);
+                        curve.Points.Add(new Polycurve.Arc(point.x, point.y, outerRadius, middleAngle, endAngle));
+                    }
+                    else
+                    {
+                        point = PolarToCartesian(zone, outerRadius, endAngle);
+                        curve.Points.Add(new Polycurve.Arc(point.x, point.y, outerRadius, startAngle, endAngle));
+                    }
 
                     point = PolarToCartesian(zone, innerRadius, endAngle);
                     curve.Points.Add(new Polycurve.Arc(point.x, point.y));
 
-                    curve.Points.Add(new Polycurve.Arc(startPoint.x, startPoint.y, innerRadius, endAngle, startAngle));
+                    if (isCircle)
+                    {
+                        var middleAngle = startAngle + (endAngle - startAngle) / 2;
+
+                        point = PolarToCartesian(zone, innerRadius, middleAngle);
+                        curve.Points.Add(new Polycurve.Arc(point.x, point.y, innerRadius, endAngle, middleAngle));
+
+                        curve.Points.Add(new Polycurve.Arc(startPoint.x, startPoint.y, innerRadius, middleAngle, startAngle));
+                    }
+                    else
+                    {
+                        curve.Points.Add(new Polycurve.Arc(startPoint.x, startPoint.y, innerRadius, endAngle, startAngle));
+                    }
 
                     return curve;
             }
